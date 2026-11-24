@@ -1,0 +1,14 @@
+# Personal account data — never commit
+data/
+build/
+portfolio-report.html
+.mcp.json
+.claude/settings.local.json
+.env
+*.env
+
+# Python / OS
+__pycache__/
+*.pyc
+.DS_Store
+node_modules/

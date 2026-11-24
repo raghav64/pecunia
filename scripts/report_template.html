@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio Lab</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1b1f24;--mute:#5f6b7a;--line:#e3e7ec;--pos:#13865a;--neg:#c8372d;--acc:#2f5bd3}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .in{position:relative;max-width:1200px;margin:auto;display:flex;align-items:center;gap:18px;padding:10px 20px}
+.brand{font-weight:700;font-size:17px;white-space:nowrap}.brand span{color:var(--acc)}
+.tabs{display:flex;gap:4px;overflow-x:auto}
+.tabs a{color:var(--mute);text-decoration:none;padding:7px 14px;border-radius:9px;font-weight:550;white-space:nowrap}
+.tabs a:hover{background:#f0f3f8}.tabs a.on{background:var(--acc);color:#fff}
+.live{margin-left:auto;font-size:12px;color:var(--mute);white-space:nowrap}
+.live i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#bbb;margin-right:6px;vertical-align:0}
+.live.on i{background:#13865a}
+main{max-width:1200px;margin:auto;padding:22px 20px 80px}
+.page{display:none}.page.on{display:block}
+h1{font-size:26px;margin:4px 0 2px}h2{font-size:20px;margin:0 0 4px}h3{font-size:16px;margin:16px 0 6px}
+.sub{color:var(--mute);margin:0 0 14px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin:18px 0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px;margin:16px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi .l{color:var(--mute);font-size:13px}.kpi .v{font-size:23px;font-weight:650;font-variant-numeric:tabular-nums}.kpi .s{font-size:13px;color:var(--mute)}
+.kpi.hero{border-color:#bcd0f5;background:#f5f8ff}
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:12px}.compare .kpi{background:#fafbfc}.compare .kpi.hero{background:#f5f8ff}
+.pos{color:var(--pos)}.neg{color:var(--neg)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+.chartbox{position:relative;height:360px}.chartbox.sm{height:290px}.chartbox.xs{height:240px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.seg button{font:inherit;font-weight:550;padding:8px 16px;border:0;background:none;color:var(--mute);cursor:pointer}
+.seg button.on{background:var(--acc);color:#fff}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;align-items:center}
+.btns>button{font:inherit;font-size:13px;padding:5px 12px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--mute);cursor:pointer}
+.btns>button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;font-weight:600;padding:7px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.chip small{display:block;font-weight:500;font-size:11px;color:var(--mute)}
+.chip.on{border-color:var(--acc);background:#eef2fb;color:var(--acc)}
+.toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+input,select{font:inherit;padding:8px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+.primary{font:inherit;font-weight:600;padding:8px 16px;border-radius:9px;border:1px solid var(--acc);background:var(--acc);color:#fff;cursor:pointer}
+.primary:disabled{opacity:.6;cursor:wait}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}th.l,td.l{text-align:left}
+th{color:var(--mute);font-weight:550;position:sticky;top:0;background:#fff;z-index:1}
+th.sort{cursor:pointer;user-select:none}th.sort:hover{color:var(--acc)}
+tr.click{cursor:pointer}tr.click:hover td{background:#f5f8ff}tr.me td{background:#f5f8ff;font-weight:650}
+.tblwrap{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.bar{height:6px;background:#dfe5f2;border-radius:3px;overflow:hidden;min-width:60px}.bar i{display:block;height:100%;background:var(--acc)}
+.note{background:#f4f7ff;border-left:3px solid var(--acc);padding:10px 14px;border-radius:6px;color:#2a3442;font-size:14px;margin:12px 0}
+.warn{background:#fff7ec;border-left-color:#d98a1c}.err{background:#fdeeee;border-left-color:#c8372d}
+#treemap{position:relative;height:420px;border-radius:10px;overflow:hidden}
+#treemap div{position:absolute;border:2px solid #fff;color:#fff;padding:6px;overflow:hidden;font-size:12px;line-height:1.25;border-radius:6px}#treemap b{font-size:14px;display:block}
+.legend{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--mute);margin-top:8px}
+.legend span{display:inline-block;width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,#b3261e,#aaaaaa,#0f7b4f)}
+.obs{display:grid;gap:12px}.obs .item{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.obs .item h4{margin:0 0 4px;font-size:15px}.obs .item p{margin:0;color:#334}
+.tag{display:inline-block;font-size:11px;font-weight:650;padding:2px 8px;border-radius:20px;margin-right:6px;vertical-align:2px}
+.t-hi{background:#fde8e6;color:#a1271e}.t-md{background:#fff1dc;color:#99600d}.t-lo{background:#e5f4ec;color:#0f6b44}.t-in{background:#e8eefc;color:#2a4fb5}
+.tooltip{position:fixed;pointer-events:none;background:#1b1f24;color:#fff;padding:8px 10px;border-radius:8px;font-size:12px;display:none;z-index:50;max-width:280px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff;cursor:pointer;transition:.15s}
+.card:hover{border-color:var(--acc);box-shadow:0 2px 10px rgba(47,91,211,.08)}
+.card .t{font-weight:650}.card .d{color:var(--mute);font-size:14px}
+.explain{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.explain .box{border:1px solid var(--line);border-radius:10px;padding:14px}.explain .big{font-size:28px;font-weight:650}
+code{background:#f1f3f6;padding:1px 5px;border-radius:4px;font-size:13px}
+.rbtn{font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap}
+.rbtn:hover{border-color:var(--acc);color:var(--acc)}.rbtn.busy{color:var(--acc);border-color:var(--acc)}
+.rbtn.busy::before{content:"";display:inline-block;width:10px;height:10px;border:2px solid var(--acc);border-right-color:transparent;border-radius:50%;margin-right:6px;vertical-align:-1px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rpanel{display:none;position:absolute;right:20px;top:54px;width:400px;max-width:calc(100vw - 40px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px rgba(20,30,50,.15);padding:16px;z-index:40;font-size:14px}
+.rpanel.on{display:block}.rpanel h4{margin:0 0 6px;font-size:15px}.rpanel p{margin:4px 0 10px;color:var(--mute);font-size:13px}
+.rpanel .opt{display:block;width:100%;text-align:left;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;margin-bottom:8px}
+.rpanel .opt:hover{border-color:var(--acc);background:#f5f8ff}.rpanel .opt b{display:block}.rpanel .opt small{color:var(--mute)}
+.rprog{height:8px;background:#e8ecf3;border-radius:4px;overflow:hidden;margin:10px 0 6px}.rprog i{display:block;height:100%;background:var(--acc);transition:width .4s}
+.rlog{font:11px/1.45 ui-monospace,Menlo,monospace;background:#f6f7f9;border-radius:8px;padding:8px;max-height:150px;overflow:auto;white-space:pre-wrap;color:#445;margin-top:8px}
+footer{color:var(--mute);font-size:12px;text-align:center;margin-top:30px}
+</style>
+</head>
+<body>
+<header><div class="in">
+ <div class="brand">Portfolio <span>Lab</span></div>
+ <nav class="tabs"><a href="#/home" data-p="home">Home</a><a href="#/benchmarks" data-p="benchmarks">S&amp;P 500 / Nasdaq</a><a href="#/compare" data-p="compare">Compare any ticker</a><a href="#/dips" data-p="dips">Dip buying</a><a href="#/sectors" data-p="sectors">Re-orient</a><a href="#/data" data-p="data">Data</a></nav>
+ <div class="live" id="live"><i></i><span>Static mode</span></div>
+ <button class="rbtn" id="rbtn" title="Rebuild this page with fresh data">↻ Refresh</button>
+ <div class="rpanel" id="rpanel">
+  <div id="rbody"></div>
+ </div>
+</div></header>
+<main>
+
+<!-- ================= HOME ================= -->
+<div class="page" id="p-home">
+ <h1>Your portfolio</h1>
+ <p class="sub" id="subtitle"></p>
+ <div class="kpis" id="kpis"></div>
+
+ <section>
+  <h2>If you'd put the same dollars into…</h2>
+  <p class="sub">Each bar shows what your exact deposits, on your exact dates, would be worth today in that ticker. Click a bar to open its comparison. Sector ETFs and other stocks are on the <a href="#/sectors">Re-orient</a> page.</p>
+  <div class="chartbox sm"><canvas id="c-home-rank"></canvas></div>
+  <div class="cards" style="margin-top:16px">
+   <div class="card" onclick="go('benchmarks')"><div class="t">📈 S&amp;P 500 / Nasdaq-100 →</div><div class="d">Compare against the market, with time-weighted returns, calendar years and drawdowns.</div></div>
+   <div class="card" onclick="go('compare')"><div class="t">🔍 Compare any ticker →</div><div class="d">Pick COST, AMZN, GOOGL, WMT or MSFT, or type any ticker to run the same analysis.</div></div>
+   <div class="card" onclick="go('dips')"><div class="t">📉 Dip buying →</div><div class="d">Your best months, every sell-off and the news behind it, and how much buying the dip added.</div></div>
+   <div class="card" onclick="go('sectors')"><div class="t">🧭 Re-orient: sectors &amp; picks →</div><div class="d">Would staples, banks, healthcare or energy have helped? Data-scored picks per sector, a "what if I'd put $X in" calculator, and a mix builder.</div></div>
+   <div class="card" onclick="go('data')"><div class="t">🧾 Trades &amp; method →</div><div class="d">All <span id="ntr"></span> trades, how the numbers are calculated, and a check against Webull's positions.</div></div>
+  </div>
+ </section>
+
+ <section>
+  <h2>Holdings</h2>
+  <p class="sub">Tile size shows position size and color shows return since purchase. Hover over a tile for details. Click a column header to sort.</p>
+  <div id="treemap"></div>
+  <div class="legend">−60% <span></span> +120% · grey ≈ 0%</div>
+  <div class="grid2" style="margin-top:18px">
+   <div class="chartbox"><canvas id="c-life"></canvas></div>
+   <div class="chartbox"><canvas id="c-conc"></canvas></div>
+  </div>
+  <div class="tblwrap" style="margin-top:18px"><table id="tbl"></table></div>
+ </section>
+
+ <section>
+  <h2>Sectors &amp; themes</h2>
+  <p class="sub">Your sector weights compared with approximate S&amp;P 500 weights. QQQ's holdings overlap heavily with your big tech stocks.</p>
+  <div class="grid2"><div class="chartbox sm"><canvas id="c-sector"></canvas></div><div class="chartbox sm"><canvas id="c-theme"></canvas></div></div>
+  <div class="chartbox" style="margin-top:18px"><canvas id="c-vs"></canvas></div>
+ </section>
+
+ <section><h2>Observations</h2><div class="obs" id="obs"></div></section>
+ <section><h2>Recommendations</h2><p class="sub">General ideas based on the data. This is not personalized investment advice.</p><div class="obs" id="recsList"></div></section>
+</div>
+
+<!-- ================= BENCHMARKS ================= -->
+<div class="page" id="p-benchmarks">
+ <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between">
+  <div><h1>You vs the market</h1><p class="sub" style="margin:0">Your trades replayed in an index fund: same dollars, same days.</p></div>
+  <div class="seg" id="benchSeg"><button data-t="SPY" class="on">S&amp;P 500</button><button data-t="QQQ">Nasdaq-100</button></div>
+ </div>
+ <div id="bench-view"></div>
+ <section>
+  <h2>Why Webull shows +21.9% when your time-weighted return is much higher</h2>
+  <p class="sub">Webull's figure is <b>unrealized P&amp;L ÷ cost basis</b>. Every dollar counts the same whether you invested it in Feb 2024 or last week. Most of your money went in recently, so it hasn't had much time to grow.</p>
+  <div class="explain" id="explain"></div>
+  <div class="chartbox sm" style="margin-top:16px"><canvas id="c-age"></canvas></div>
+ </section>
+</div>
+
+<!-- ================= COMPARE ================= -->
+<div class="page" id="p-compare">
+ <h1>Compare against any ticker</h1>
+ <p class="sub">The same shadow analysis: every dollar you invested goes into this ticker instead, on the same day. Dividends are reinvested.</p>
+ <section style="margin-top:8px">
+  <div class="toolbar">
+   <div><div class="sub" style="margin:0 0 6px;font-size:13px">Blue chips</div><div class="chips" id="chips"></div></div>
+   <div style="margin-left:auto">
+    <div class="sub" style="margin:0 0 6px;font-size:13px">Any ticker</div>
+    <form id="tform" style="display:flex;gap:8px"><input id="tin" placeholder="e.g. NVDA, BRK.B, VTI" style="width:200px;text-transform:uppercase" autocomplete="off"><button class="primary" id="trun">Run analysis</button></form>
+   </div>
+  </div>
+  <div id="cmsg"></div>
+ </section>
+ <div id="cmp-view"></div>
+ <section>
+  <h2>Leaderboard</h2>
+  <p class="sub">Every ticker analyzed so far, ranked by what your dollars would be worth today. Click a row to open it.</p>
+  <div class="tblwrap"><table id="board"></table></div>
+ </section>
+</div>
+
+<!-- ================= DATA ================= -->
+<div class="page" id="p-dips">
+ <h1>Buying the dips</h1>
+ <p class="sub">Which months' dollars did best, what was happening in the market when you bought, and whether buying during sell-offs actually paid off.</p>
+ <div class="kpis" id="dkpis"></div>
+ <section>
+  <h2>What you invested each month vs how far the S&amp;P 500 was below its high</h2>
+  <p class="sub">Bars: dollars invested that month, colored by their return to date (greener = better). Line: the S&amp;P 500's distance from its 52-week high.</p>
+  <div class="chartbox"><canvas id="dchart"></canvas></div>
+ </section>
+ <section>
+  <h2>Every month's dollars, ranked</h2>
+  <p class="sub">Return = what that month's buys are worth today (dividends reinvested) ÷ what they cost. Older months have had more time to grow, so compare against the "Same $ in S&amp;P 500" column, which had the same amount of time.</p>
+  <div class="btns" id="dsort"><button data-k="ret" class="on">Sort by return</button><button data-k="gain">By $ gain</button><button data-k="edge">By timing edge</button><button data-k="m">By date</button></div>
+  <div class="tblwrap"><table id="dmonths"></table></div>
+ </section>
+ <section>
+  <h2>Does buying the dip pay?</h2>
+  <p class="sub"><b>3/6-month return</b> is how the stock you bought did over the next 3 or 6 months, weighted by dollars, so every buy gets the same amount of time. <b>Timing edge</b> is what you have today minus what you'd have if the same dollars had bought the same stock at its average price over the previous 3 months.</p>
+  <div class="grid2">
+   <div><h3>By how far the S&amp;P 500 was below its high</h3><div class="tblwrap"><table id="dbk"></table></div></div>
+   <div><h3>By how far the stock itself was below its high</h3><div class="tblwrap"><table id="dsbk"></table></div></div>
+  </div>
+  <div class="note" id="dnote"></div>
+ </section>
+ <section>
+  <h2>Each sell-off and the news behind it</h2>
+  <p class="sub">An episode starts when the S&amp;P 500 falls 5% or more below its 52-week high and ends when it's back within 2%. Each card covers what you bought from the start of the slide to the recovery.</p>
+  <div class="obs" id="deps"></div>
+ </section>
+ <section>
+  <h2>Days the S&amp;P 500 fell 2% or more</h2>
+  <p class="sub">What you bought that day and the next 3 trading days, and how those buys did over the next 3 months.</p>
+  <div class="tblwrap"><table id="dbig"></table></div>
+ </section>
+</div>
+
+<div class="page" id="p-sectors">
+ <h1>Re-orient: would other sectors have helped?</h1>
+ <p class="sub">Every number here uses your real deposit dates. Pick the date to measure at: results look very different at the October 2026 peak than after the November sell-off.</p>
+ <section style="padding:14px 22px">
+  <div class="toolbar">
+   <label style="flex:1;min-width:280px"><span style="font-size:13px;color:var(--mute)">Measure as of <b id="sxEndLbl"></b></span><br><input type="range" id="sxEnd" style="width:100%;padding:0"></label>
+   <div class="btns" style="margin:0"><button id="sxToday">Latest close</button><button id="sxPeak">S&amp;P 500 peak</button><button id="sxY25">End of 2025</button></div>
+  </div>
+ </section>
+ <div class="kpis" id="sxk"></div>
+ <section>
+  <h2>Sector ETFs: what each would have done for you</h2>
+  <p class="sub"><b>All in</b>: every dollar you deposited goes into that ETF on the same day instead. <b>20% sleeve</b>: 20% of every deposit goes to the ETF and 80% to the stocks you actually bought. <b>Moves with you</b> is the correlation of daily returns: 1.0 means it moves exactly like your portfolio, 0 means unrelated. Lower numbers diversify you more.</p>
+  <div class="tblwrap"><table id="sxEtf"></table></div>
+ </section>
+ <section>
+  <h2>Top picks by sector</h2>
+  <p class="sub">The score ranks on more than past return, because past winners often stop winning: <b>35%</b> return per unit of volatility · <b>25%</b> how many calendar years it beat the S&amp;P 500 · <b>20%</b> how shallow its worst drop was · <b>20%</b> how little it moves with your current portfolio. All are scored across the whole universe, over the full period.</p>
+  <div class="btns" id="sxSecs"></div>
+  <div class="toolbar" style="margin:6px 0 12px">
+   <label>Amount<br><input id="sxAmt" type="number" min="1" step="100" value="10000" style="width:130px"></label>
+   <label>How<br><select id="sxMode"><option value="lump">Lump sum, once</option><option value="dca">Every month</option></select></label>
+   <label>Starting<br><input id="sxStart" type="date"></label>
+   <span id="sxCalcNote" style="color:var(--mute);font-size:13px;padding-bottom:9px"></span>
+  </div>
+  <div class="tblwrap" style="max-height:none"><table id="sxPicks"></table></div>
+ </section>
+ <section>
+  <h2>Mix builder: re-run your history with a different mix</h2>
+  <p class="sub">Choose what share of every deposit goes to each fund or stock. Whatever is left goes into the stocks you actually bought. Start from a preset or add any ticker in the list.</p>
+  <div class="btns" id="sxPresets"></div>
+  <div id="sxMix" class="obs" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px"></div>
+  <div class="toolbar" style="margin:10px 0"><select id="sxAdd"></select><button class="primary" id="sxAddBtn">Add</button><span id="sxRest" style="color:var(--mute);font-size:13px"></span></div>
+  <div class="kpis" id="sxMixK"></div>
+  <div class="chartbox"><canvas id="sxChart"></canvas></div>
+ </section>
+ <section>
+  <h2>What the data says</h2>
+  <div class="obs" id="sxRecs"></div>
+ </section>
+</div>
+
+<div class="page" id="p-data">
+ <h1>Trades &amp; method</h1>
+ <section>
+  <h2>Trade log</h2>
+  <p class="sub">Every filled order from Webull's order history. These are the exact cash flows used in every shadow comparison.</p>
+  <div class="btns"><input id="tq" placeholder="Filter symbol / date…" style="width:220px"><select id="tside"><option value="">All sides</option><option>BUY</option><option>SELL</option></select><span id="tcount" style="color:var(--mute);font-size:13px"></span></div>
+  <div class="tblwrap"><table id="tlog"></table></div>
+ </section>
+ <section>
+  <h2>Method &amp; data quality</h2>
+  <ul style="color:#334;padding-left:20px;margin:0 0 12px">
+   <li><b>Trades:</b> pulled read-only from Webull's order history. Filled orders only, dated in US Eastern time.</li>
+   <li><b>Prices:</b> Yahoo Finance daily closes, with splits applied to older trades. Dividends are modelled as reinvested on the ex-date, matching Webull's automatic reinvestment.</li>
+   <li><b>Shadow portfolio:</b> each day's net buys go into the ticker at that day's adjusted close. Sells come out of it. If a ticker started trading after your first trade, money waits in cash until its first trading day.</li>
+   <li><b>IRR:</b> the yearly return on your invested money, from those exact cash flows. <b>Time-weighted return:</b> daily returns (close ÷ (previous close + that day's net buys)) multiplied together. For a single ticker, this is simply its total return.</li>
+   <li><b>Valuation date:</b> closing prices on <span class="endd"></span>. Rebuilt holdings value <span id="mv-rebuilt"></span> vs Webull's live <span id="mv-webull"></span>.</li>
+   <li><b>Left out:</b> <span id="legacy"></span></li>
+  </ul>
+  <h3>Reconciliation: rebuilt shares vs Webull positions</h3>
+  <p class="sub" id="recon-sum"></p>
+  <div class="tblwrap" style="max-height:340px"><table id="recon"></table></div>
+  <h3>Refresh &amp; scripts</h3>
+  <ul style="color:#334;padding-left:20px;margin:0">
+   <li><code>./run.sh [EXTRA TICKERS]</code>: full refresh (orders → analysis → shadows → this page).</li>
+   <li><code>./serve.sh</code>: run this app locally so the Compare page can analyze any ticker.</li>
+   <li><code>uv run python scripts/shadow.py COST WMT NVDA</code>: run the shadow analysis from the terminal (<code>--list</code> shows saved results).</li>
+  </ul>
+ </section>
+</div>
+<footer id="foot"></footer>
+</main>
+<div class="tooltip" id="tip"></div>
+
+<script>
+const A=/*ANALYSIS*/null;
+const P=/*POSITIONS*/null;
+const SH=/*SHADOWS*/null;
+const DP=/*DIPS*/null;
+const SX=/*SECTORS*/null;
+const DEMO=/*DEMO*/false;
+const REPO="https://github.com/raghav64/pecunia";
+const BLUE=["COST","AMZN","GOOGL","WMT","MSFT"];
+const INFO={GOOGL:["Alphabet","Communication Services","Internet & Media"],NVDA:["NVIDIA","Information Technology","Semiconductors"],AAPL:["Apple","Information Technology","Hardware & Networking"],META:["Meta Platforms","Communication Services","Internet & Media"],PANW:["Palo Alto Networks","Information Technology","Software & Cybersecurity"],CRWD:["CrowdStrike","Information Technology","Software & Cybersecurity"],AMD:["Advanced Micro Devices","Information Technology","Semiconductors"],MSFT:["Microsoft","Information Technology","Software & Cybersecurity"],COST:["Costco","Consumer Staples","Consumer"],AMZN:["Amazon","Consumer Discretionary","Internet & Media"],QQQ:["Invesco QQQ (Nasdaq-100)","ETF – Nasdaq-100","Index ETF"],ANET:["Arista Networks","Information Technology","Hardware & Networking"],SPOT:["Spotify","Communication Services","Internet & Media"],APP:["AppLovin","Information Technology","Software & Cybersecurity"],AXP:["American Express","Financials","Financials"],TSLA:["Tesla","Consumer Discretionary","Consumer"],PLTR:["Palantir","Information Technology","Software & Cybersecurity"],CAVA:["CAVA Group","Consumer Discretionary","Consumer"],AVGO:["Broadcom","Information Technology","Semiconductors"],CMG:["Chipotle","Consumer Discretionary","Consumer"],TSM:["Taiwan Semiconductor","Information Technology","Semiconductors"],SOUN:["SoundHound AI","Information Technology","Software & Cybersecurity"],SNDK:["SanDisk","Information Technology","Semiconductors"],SPCX:["SPCX","Other / unclassified","Other"],SERV:["Serve Robotics","Industrials","Other"]};
+const SP_SECTORS={"Information Technology":33,"Financials":13,"Communication Services":10,"Consumer Discretionary":10.5,"Health Care":9.5,"Industrials":8.5,"Consumer Staples":5,"Energy":3,"Utilities":2.5,"Real Estate":2,"Materials":2};
+const PAL=["#2f5bd3","#e07b39","#13865a","#8e44ad","#c8372d","#1fa2b8","#d4a017","#6b7a8f","#e05297","#4b8b3b","#a0522d"];
+const C={you:"#2f5bd3",bench:"#c27c0e",ref:"#9aa3ae",inv:"#6b7a8f"};
+
+const $=id=>document.getElementById(id);
+const fmt$=(v,d=0)=>(v<0?"−$":"$")+Math.abs(v).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtP=(v,d=1)=>(v>0?"+":v<0?"−":"")+Math.abs(v).toFixed(d)+"%";
+const sgn$=v=>(v>=0?"+":"−")+fmt$(Math.abs(v));
+const pts=v=>(v>=0?"+":"−")+Math.abs(v*100).toFixed(1)+" pts";
+const cls=v=>v>=0?"pos":"neg";
+const dfmt=d=>new Date(d+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// diff = your value − its value. Always say who is ahead, never a bare signed number.
+const ahead=(diff,name)=>diff>=0?`<span class="pos">You, by ${fmt$(diff)}</span>`:`<span class="neg">${esc(name)}, by ${fmt$(-diff)}</span>`;
+const eff=x=>x>=0?`<b class="pos">${fmt$(x)} more</b>`:`<b class="neg">${fmt$(-x)} less</b>`;
+const kpi=(l,v,s,c="",hero=false)=>`<div class="kpi${hero?" hero":""}"><div class="l">${l}</div><div class="v ${c}">${v}</div><div class="s">${s}</div></div>`;
+const charts={};function mk(id,cfg){if(charts[id])charts[id].destroy();const el=$(id);if(!el)return;charts[id]=new Chart(el,cfg);}
+Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif';Chart.defaults.color='#5f6b7a';
+const S=A.stats,SER=A.series,END=S.end,NLV=P.net_liquidation,CASH=P.cash;
+const lineOpts=f=>({maintainAspectRatio:false,interaction:{mode:"index",intersect:false},scales:{x:{ticks:{maxTicksLimit:10},grid:{display:false}},y:{ticks:{callback:f}}},plugins:{tooltip:{filter:c=>c.parsed.y!=null,callbacks:{label:c=>`${c.dataset.label}: ${f(c.parsed.y)}`}}}});
+const shortName=t=>{const s=SH[t];if(!s)return t;return ({SPY:"S&P 500",QQQ:"Nasdaq-100"})[t]||s.name.replace(/,? (Inc\.?|Corporation|Corp\.?|Company|Co\.)$/,"");};
+let LIVE=false;
+
+// ================= router =================
+const rendered={};
+function go(p){location.hash="#/"+p;}
+function route(){
+ const p=(location.hash.match(/^#\/(\w+)/)||[,"home"])[1],q=new URLSearchParams(location.hash.split("?")[1]||"");
+ const page=["home","benchmarks","compare","dips","sectors","data"].includes(p)?p:"home";
+ document.querySelectorAll(".page").forEach(x=>x.classList.toggle("on",x.id==="p-"+page));
+ document.querySelectorAll(".tabs a").forEach(a=>a.classList.toggle("on",a.dataset.p===page));
+ if(!rendered[page]){({home:renderHome,benchmarks:renderBench,compare:renderCompare,dips:renderDips,sectors:renderSect,data:renderData})[page]();rendered[page]=true;}
+ if(page==="compare"&&q.get("t")&&q.get("t")!==cmpT)selectTicker(q.get("t"));
+ if(page==="home")treemap();
+ scrollTo(0,0);
+}
+addEventListener("hashchange",route);
+
+// ================= shared shadow component =================
+// Renders a full comparison (KPIs, value/diff/monthly chart, TWR chart, years, drawdown) for ticker t into el.
+const VS={};
+function shadowView(el,t,key){
+ const d=SH[t];if(!d){el.innerHTML="";return;}
+ const st=VS[key]=VS[key]||{view:"value",range:"all"};
+ const nm=shortName(t),ref=t!=="SPY"&&SH.SPY?"SPY":null;
+ const lead=S.actual_value-d.value;
+ el.innerHTML=`
+ <section>
+  <h2>Same dollars in ${esc(nm)} <small style="color:var(--mute);font-weight:400">(${esc(t)})</small></h2>
+  <p class="sub">${esc(d.name)} · ${S.n_trades.toLocaleString()} trades replayed, ${dfmt(d.start)} to ${dfmt(d.end)}</p>
+  ${d.late_start?`<div class="note warn">${esc(t)} started trading on ${dfmt(d.first_price)}. Money you invested before then is held as cash in the shadow until that date.</div>`:""}
+  ${d.stale?`<div class="note warn">No ${esc(t)} prices after ${dfmt(d.last_price)}. The last price is carried forward.</div>`:""}
+  <div class="compare">
+   ${kpi("Net invested (both)",fmt$(d.invested),`${S.n_buys.toLocaleString()} buys`)}
+   ${kpi("Your portfolio",fmt$(S.actual_value),`Gain ${sgn$(S.gain_you)} (${fmtP(S.gain_you/S.net_invested*100)})`,cls(S.gain_you))}
+   ${kpi(`All in ${esc(t)}`,fmt$(d.value),`Gain ${sgn$(d.gain)} (${fmtP(d.gain/d.invested*100)})`,cls(d.gain))}
+   ${lead>=0?kpi(`You outperformed ${esc(t)} by`,fmt$(lead),`Your picks are worth ${fmt$(lead)} more than the same dollars in ${esc(t)}`,"pos",true)
+            :kpi(`${esc(t)} outperformed you by`,fmt$(-lead),`The same dollars in ${esc(t)} would be worth ${fmt$(-lead)} more than your picks`,"neg",true)}
+   ${kpi("Yearly return on your money (IRR)",`${fmtP(S.irr_you*100)} vs ${d.irr==null?"n/a":fmtP(d.irr*100)}`,d.irr==null?"":`${pts(S.irr_you-d.irr)} per year`,d.irr==null?"":cls(S.irr_you-d.irr))}
+  </div>
+  <div class="btns" style="margin-top:16px" data-k="view"><button data-v="value">Account value</button><button data-v="diff">Who's ahead, over time</button><button data-v="flows">Monthly investing</button></div>
+  <div class="chartbox"><canvas id="${key}-c1"></canvas></div>
+ </section>
+ <section>
+  <h2>Time-weighted: your picks vs ${esc(nm)}</h2>
+  <p class="sub">This removes the effect of when you added money. Pick a period to start every line at 1.00 from that date.${ref?" The S&P 500 is shown in grey for reference.":""}</p>
+  <div class="btns" data-k="range"><button data-v="all">All</button><button data-v="2025-01-01">Since 2025</button><button data-v="2026-01-01">2026 YTD</button><button data-v="1y">1 year</button><button data-v="6m">6 months</button><button data-v="3m">3 months</button></div>
+  <div class="chartbox"><canvas id="${key}-c2"></canvas></div>
+  <div class="compare" id="${key}-tk"></div>
+  <div class="grid2" style="margin-top:16px">
+   <div><h3>Calendar-year returns</h3><table id="${key}-yr"></table></div>
+   <div class="chartbox sm"><canvas id="${key}-c3"></canvas></div>
+  </div>
+ </section>`;
+ el.querySelectorAll(".btns[data-k]").forEach(g=>{const k=g.dataset.k;
+  g.querySelectorAll("button").forEach(b=>{b.classList.toggle("on",b.dataset.v===st[k]);b.onclick=()=>{st[k]=b.dataset.v;g.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));k==="view"?chart1():chart2();};});});
+ const L=SER.map(r=>r.d);
+ function chart1(){
+  if(st.view==="value"){
+   const ds=[{label:"Your portfolio",data:SER.map(r=>r.v),borderColor:C.you,borderWidth:2.2,pointRadius:0},
+    {label:`Same dollars in ${t}`,data:d.vals,borderColor:C.bench,borderWidth:2,pointRadius:0}];
+   if(ref)ds.push({label:"Same dollars in S&P 500",data:SH.SPY.vals,borderColor:C.ref,borderWidth:1.2,borderDash:[5,4],pointRadius:0});
+   ds.push({label:"Net invested",data:SER.map(r=>r.inv),borderColor:C.inv,borderDash:[2,3],borderWidth:1.2,pointRadius:0});
+   mk(key+"-c1",{type:"line",data:{labels:L,datasets:ds},options:lineOpts(v=>fmt$(v))});
+  }else if(st.view==="diff"){
+   mk(key+"-c1",{type:"line",data:{labels:L,datasets:[{label:`Your lead over ${t} (below $0 = ${t} ahead)`,data:SER.map((r,i)=>r.v-d.vals[i]),borderColor:C.you,pointRadius:0,borderWidth:2,
+    fill:{target:"origin",above:"rgba(19,134,90,.18)",below:"rgba(200,55,45,.18)"}}]},options:lineOpts(v=>fmt$(v))});
+  }else{
+   const M=A.monthly;
+   mk(key+"-c1",{type:"bar",data:{labels:M.map(m=>m.m),datasets:[{label:"Bought",data:M.map(m=>m.buy),backgroundColor:C.you,borderRadius:3},{label:"Sold",data:M.map(m=>-m.sell),backgroundColor:"#c8372d",borderRadius:3}]},
+    options:{maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>fmt$(v)}}},plugins:{tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmt$(Math.abs(c.parsed.y))}`,afterBody:it=>`${M[it[0].dataIndex].n} orders`}}}}});
+  }
+ }
+ function chart2(){
+  let i=0;const r=st.range;
+  if(r!=="all"){let dd=r;if(/^\d+[my]$/.test(r)){const e=new Date(END+"T12:00"),n=parseInt(r);r.endsWith("y")?e.setFullYear(e.getFullYear()-n):e.setMonth(e.getMonth()-n);dd=e.toISOString().slice(0,10);}i=Math.max(0,SER.findIndex(x=>x.d>=dd));}
+  while(i<SER.length-1&&d.idx[i]==null)i++;
+  const b=SER[i],bi=d.idx[i],yrs=(new Date(END)-new Date(b.d))/864e5/365.25,sl=SER.slice(i);
+  const ds=[{label:"You",data:sl.map(x=>x.twr/b.twr),borderColor:C.you,borderWidth:2.2,pointRadius:0},
+   {label:t,data:d.idx.slice(i).map(x=>x==null?null:x/bi),borderColor:C.bench,borderWidth:1.8,pointRadius:0}];
+  if(ref){const ri=SH.SPY.idx[i];ds.push({label:"S&P 500",data:SH.SPY.idx.slice(i).map(x=>x/ri),borderColor:C.ref,borderWidth:1.2,borderDash:[5,4],pointRadius:0});}
+  mk(key+"-c2",{type:"line",data:{labels:sl.map(x=>x.d),datasets:ds},options:lineOpts(v=>v.toFixed(2)+"×")});
+  const e=SER.length-1,ry=SER[e].twr/b.twr-1,rt=d.idx[e]/bi-1,an=x=>yrs>=1?`${fmtP((Math.pow(1+x,1/yrs)-1)*100)}/yr`:"&nbsp;";
+  let h=kpi(`You, since ${dfmt(b.d)}`,fmtP(ry*100),an(ry),cls(ry),true)+kpi(t,fmtP(rt*100),an(rt),cls(rt))+kpi(`You vs ${esc(t)}`,pts(ry-rt),ry>=rt?"Your picks did better":`${esc(t)} did better`,cls(ry-rt));
+  if(ref){const rs=SH.SPY.idx[e]/SH.SPY.idx[i]-1;h+=kpi("S&P 500 (reference)",fmtP(rs*100),an(rs),cls(rs));}
+  $(key+"-tk").innerHTML=h;
+ }
+ function years(){
+  const ys=[...new Set(SER.map(r=>r.d.slice(0,4)))];let rows="";
+  ys.forEach(y=>{const idx=SER.map((r,i)=>r.d.slice(0,4)===y?i:-1).filter(i=>i>=0),s=idx[0],e=idx[idx.length-1],p=Math.max(0,s-1);
+   const a=SER[e].twr/SER[p].twr-1;let pi=p;while(pi<=e&&d.idx[pi]==null)pi++;const tv=pi<=e?d.idx[e]/d.idx[pi]-1:null;
+   const sv=ref?SH.SPY.idx[e]/SH.SPY.idx[p]-1:null;
+   rows+=`<tr><td class="l">${y}${y===ys[0]?' <small style="color:var(--mute)">(partial)</small>':y===ys[ys.length-1]?' <small style="color:var(--mute)">(YTD)</small>':""}</td><td class="${cls(a)}"><b>${fmtP(a*100)}</b></td><td class="${tv==null?"":cls(tv)}">${tv==null?"—":fmtP(tv*100)}</td><td class="${tv==null?"":cls(a-tv)}">${tv==null?"—":pts(a-tv)}</td>${ref?`<td style="color:var(--mute)">${fmtP(sv*100)}</td>`:""}</tr>`;});
+  $(key+"-yr").innerHTML=`<thead><tr><th class="l">Year</th><th>You</th><th>${esc(t)}</th><th>Difference</th>${ref?"<th>S&amp;P 500</th>":""}</tr></thead><tbody>${rows}</tbody>`;
+  const dd=arr=>{let pk=0;return arr.map(x=>{if(x==null)return null;pk=Math.max(pk,x);return (x/pk-1)*100;});};
+  mk(key+"-c3",{type:"line",data:{labels:L,datasets:[{label:"You",data:dd(SER.map(r=>r.twr)),borderColor:C.you,backgroundColor:"rgba(47,91,211,.12)",fill:true,pointRadius:0,borderWidth:1.5},
+   {label:t,data:dd(d.idx),borderColor:C.bench,pointRadius:0,borderWidth:1.3}]},
+   options:{...lineOpts(v=>v.toFixed(0)+"%"),plugins:{title:{display:true,text:`Drawdown from previous high (worst: you ${fmtP(S.dd_you*100)}, ${t} ${fmtP(d.dd*100)})`},tooltip:{callbacks:{label:c=>c.parsed.y==null?null:`${c.dataset.label}: ${c.parsed.y.toFixed(1)}%`}}}}});
+ }
+ chart1();chart2();years();
+}
+
+// ================= HOME =================
+function renderHome(){
+ document.querySelectorAll(".endd").forEach(e=>e.textContent=dfmt(END));
+ $("subtitle").textContent=`Webull Individual Cash · ${S.n_trades.toLocaleString()} trades from ${dfmt(S.first_trade)} to ${dfmt(S.last_trade)} · closing prices as of ${dfmt(END)}`;
+ $("ntr").textContent=S.n_trades.toLocaleString();
+ const spy=SH.SPY||{value:S.shadow_value,irr:S.irr_spy},lead=S.actual_value-spy.value;
+ $("kpis").innerHTML=[
+  kpi("Account value",fmt$(NLV),`${Object.keys(P.positions).length} positions · ${fmt$(CASH)} cash`),
+  kpi(lead>=0?"You outperformed the S&P 500 by":"The S&P 500 outperformed you by",fmt$(Math.abs(lead)),`same dollars, same dates: ${fmt$(S.actual_value)} vs ${fmt$(spy.value)}`,cls(lead),true),
+  kpi("Yearly return on your money (IRR)",fmtP(S.irr_you*100)+"/yr",`S&P 500 ${fmtP(spy.irr*100)}/yr`,cls(S.irr_you-spy.irr),true),
+  kpi("True time-weighted return",fmtP(S.twr_you*100),`${fmtP(S.twr_you_ann*100)}/yr · S&P ${fmtP(S.twr_spy*100)}`,cls(S.twr_you-S.twr_spy)),
+  kpi("Worst peak-to-trough drop",fmtP(S.dd_you*100),`S&P 500 ${fmtP(S.dd_spy*100)}`,"neg"),
+ ].join("");
+ homeRank();table();holdingCharts();sectorCharts();narrative();
+}
+function homeRank(){
+ const uni=new Set(SX?Object.keys(SX.rows):[]),keep=new Set(["SPY","QQQ",...BLUE]);
+ const rows=[{t:"YOU",n:"Your portfolio",v:S.actual_value}].concat(Object.values(SH).filter(s=>keep.has(s.ticker)||!uni.has(s.ticker)||(H.some(h=>h.s===s.ticker))).map(s=>({t:s.ticker,n:shortName(s.ticker),v:s.value}))).sort((a,b)=>b.v-a.v);
+ mk("c-home-rank",{type:"bar",data:{labels:rows.map(r=>r.t==="YOU"?"★ You":`${r.t} · ${r.n}`),datasets:[{data:rows.map(r=>r.v),backgroundColor:rows.map(r=>r.t==="YOU"?C.you:r.v>S.actual_value?"#c9a35a":"#cfd6e0"),borderRadius:4}]},
+  options:{indexAxis:"y",maintainAspectRatio:false,onHover:(e,a)=>e.native.target.style.cursor=a.length&&rows[a[0].index].t!=="YOU"?"pointer":"default",
+  onClick:(e,a)=>{if(!a.length)return;const r=rows[a[0].index];if(r.t==="YOU")return;r.t==="SPY"||r.t==="QQQ"?(benchT=r.t,go("benchmarks"),rendered.benchmarks&&renderBench()):location.hash="#/compare?t="+r.t;},
+  plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const r=rows[c.dataIndex];return r.t==="YOU"?fmt$(r.v):`${fmt$(r.v)} · ${S.actual_value>=r.v?`you're ahead by ${fmt$(S.actual_value-r.v)}`:`ahead of you by ${fmt$(r.v-S.actual_value)}`}`;}}}},
+  scales:{x:{min:Math.floor(S.net_invested*0.9/10000)*10000,ticks:{callback:v=>fmt$(v)}},y:{grid:{display:false}}}}});
+}
+const H=Object.entries(P.positions).map(([s,[q,cost,last,mv,pnl]])=>{const i=INFO[s]||[s,"Other / unclassified","Other"];return {s,name:i[0],sector:i[1],theme:i[2],q,cost,last,mv,pnl,w:mv/NLV*100,r:pnl/(mv-pnl)*100};});
+const tip=$("tip");
+function retColor(r){const c=(a,b,t)=>Math.round(a+(b-a)*t);if(r>=0){const t=Math.min(r/120,1)**.6;return `rgb(${c(170,15,t)},${c(170,123,t)},${c(170,79,t)})`;}const t=Math.min(-r/60,1)**.6;return `rgb(${c(170,179,t)},${c(170,38,t)},${c(170,30,t)})`;}
+function treemap(){
+ const el=$("treemap");if(!el||!el.clientWidth)return;const W=el.clientWidth,Hh=el.clientHeight;el.innerHTML="";
+ const items=H.map(h=>({h,v:h.mv})).concat([{h:{s:"Cash",mv:CASH},v:CASH}]).sort((a,b)=>b.v-a.v);
+ function lay(arr,x,y,w,h){if(arr.length===1){place(arr[0].h,x,y,w,h);return;}const tot=arr.reduce((s,a)=>s+a.v,0);let acc=0,k=0;while(k<arr.length-1&&acc+arr[k].v<=tot/2){acc+=arr[k].v;k++;}if(k===0){acc=arr[0].v;k=1;}
+  const f=acc/tot;if(w>=h){lay(arr.slice(0,k),x,y,w*f,h);lay(arr.slice(k),x+w*f,y,w*(1-f),h);}else{lay(arr.slice(0,k),x,y,w,h*f);lay(arr.slice(k),x,y+h*f,w,h*(1-f));}}
+ function place(h,x,y,w,hh){const d=document.createElement("div"),cash=h.s==="Cash";Object.assign(d.style,{left:x+"px",top:y+"px",width:w+"px",height:hh+"px",background:cash?"#9aa5b4":retColor(h.r)});
+  if(w>46&&hh>30)d.innerHTML=`<b>${h.s}</b>${(h.mv/NLV*100).toFixed(1)}%${hh>52&&w>60&&!cash?`<br>${fmtP(h.r)}`:""}`;
+  d.onmousemove=e=>{tip.style.display="block";tip.style.left=e.clientX+14+"px";tip.style.top=e.clientY+14+"px";tip.innerHTML=cash?`<b>Cash</b><br>${fmt$(CASH,2)}`:`<b>${h.s}</b> · ${h.name}<br>${h.sector}<br>Value ${fmt$(h.mv,2)} (${h.w.toFixed(1)}%)<br>Unrealized ${fmt$(h.pnl,2)} (${fmtP(h.r)})<br>Avg cost ${fmt$(h.cost,2)} → ${fmt$(h.last,2)}`;};
+  d.onmouseleave=()=>tip.style.display="none";el.appendChild(d);}
+ lay(items,0,0,W,Hh);
+}
+let sortK="mv",sortAsc=false;
+function table(){
+ const cols=[["Symbol","s","l"],["Name","name","l"],["Sector","sector","l"],["Qty","q"],["Avg cost","cost"],["Last","last"],["Value","mv"],["Weight","w"],["Unrealized $","pnl"],["Unrealized %","r"],["Lifetime P&L*","life"]];
+ const life=Object.fromEntries(A.per_symbol.map(p=>[p.symbol,p.pnl]));
+ const rows=H.map(h=>({...h,life:life[h.s]??0})).sort((a,b)=>{const x=a[sortK],y=b[sortK];return (typeof x==="string"?x.localeCompare(y):x-y)*(sortAsc?1:-1);});
+ const mx=Math.max(...rows.map(r=>r.w)),tmv=H.reduce((s,h)=>s+h.mv,0),tp=H.reduce((s,h)=>s+h.pnl,0);
+ $("tbl").innerHTML=`<thead><tr>${cols.map(([n,k,a])=>`<th class="sort ${a||""}" data-k="${k}">${n}${k===sortK?(sortAsc?" ▲":" ▼"):""}</th>`).join("")}</tr></thead><tbody>`+
+ rows.map(r=>`<tr class="click" data-t="${r.s}"><td class="l"><b>${r.s}</b></td><td class="l">${r.name}</td><td class="l" style="color:var(--mute)">${r.sector}</td><td>${r.q.toFixed(3)}</td><td>${fmt$(r.cost,2)}</td><td>${fmt$(r.last,2)}</td><td>${fmt$(r.mv,2)}</td>
+ <td><div style="display:flex;gap:8px;align-items:center;justify-content:flex-end">${r.w.toFixed(1)}%<div class="bar"><i style="width:${r.w/mx*100}%"></i></div></div></td><td class="${cls(r.pnl)}">${fmt$(r.pnl,2)}</td><td class="${cls(r.r)}">${fmtP(r.r)}</td><td class="${cls(r.life)}">${fmt$(r.life,0)}</td></tr>`).join("")+
+ `<tr style="font-weight:650"><td class="l">Total</td><td></td><td></td><td></td><td></td><td></td><td>${fmt$(tmv,2)}</td><td>${(tmv/NLV*100).toFixed(1)}%</td><td class="${cls(tp)}">${fmt$(tp,2)}</td><td class="${cls(tp)}">${fmtP(tp/(tmv-tp)*100)}</td><td></td></tr></tbody>`+
+ `<caption style="caption-side:bottom;text-align:left;color:var(--mute);font-size:12px;padding:8px">*Lifetime P&L is rebuilt from your trades and includes reinvested dividends. Click a row to compare your portfolio with putting everything into that stock.</caption>`;
+ document.querySelectorAll("#tbl th").forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k===sortK)sortAsc=!sortAsc;else{sortK=k;sortAsc=["s","name","sector"].includes(k);}table();});
+ document.querySelectorAll("#tbl tr.click").forEach(tr=>tr.onclick=()=>location.hash="#/compare?t="+tr.dataset.t);
+}
+function holdingCharts(){
+ const ps=A.per_symbol.filter(p=>Math.abs(p.pnl)>=1);
+ mk("c-life",{type:"bar",data:{labels:ps.map(p=>p.symbol),datasets:[{label:"Lifetime P&L",data:ps.map(p=>p.pnl),backgroundColor:ps.map(p=>p.pnl>=0?"#13865a":"#c8372d"),borderRadius:3}]},
+  options:{indexAxis:"y",maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:"Lifetime P&L by stock (from your trades)"},tooltip:{callbacks:{label:c=>{const p=ps[c.dataIndex];return [`P&L ${fmt$(p.pnl,2)} (${fmtP(p.ret)} on ${fmt$(p.bought)} bought)`,`${p.n} orders since ${p.first}`];}}}},
+  scales:{x:{ticks:{callback:v=>fmt$(v)}},y:{ticks:{autoSkip:false,font:{size:11}},grid:{display:false}}}}});
+ const w=[...H].sort((a,b)=>b.mv-a.mv);let c=0;const cum=w.map(h=>(c+=h.mv)/NLV*100);
+ mk("c-conc",{type:"bar",data:{labels:w.map(h=>h.s),datasets:[{type:"line",label:"Cumulative weight",data:cum,borderColor:"#e07b39",pointRadius:2,yAxisID:"y1"},{label:"Weight",data:w.map(h=>h.w),backgroundColor:C.you,borderRadius:3}]},
+  options:{maintainAspectRatio:false,plugins:{title:{display:true,text:"Concentration"},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(1)}%`}}},scales:{x:{ticks:{autoSkip:false,font:{size:10},maxRotation:90},grid:{display:false}},y:{ticks:{callback:v=>v+"%"}},y1:{position:"right",min:0,max:100,grid:{display:false},ticks:{callback:v=>v+"%"}}}}});
+}
+function group(k){const m={};H.forEach(h=>m[h[k]]=(m[h[k]]||0)+h.mv);m.Cash=(m.Cash||0)+CASH;return Object.entries(m).sort((a,b)=>b[1]-a[1]);}
+function sectorCharts(){
+ const dn=(id,g,t)=>mk(id,{type:"doughnut",data:{labels:g.map(x=>x[0]),datasets:[{data:g.map(x=>x[1]),backgroundColor:PAL,borderWidth:2}]},options:{maintainAspectRatio:false,cutout:"58%",plugins:{title:{display:true,text:t},legend:{position:"right",labels:{boxWidth:12,font:{size:12}}},tooltip:{callbacks:{label:c=>`${c.label}: ${fmt$(c.parsed)} (${(c.parsed/NLV*100).toFixed(1)}%)`}}}}});
+ dn("c-sector",group("sector"),"By GICS sector");dn("c-theme",group("theme"),"By theme");
+ const g=Object.fromEntries(group("sector")),names=Object.keys(SP_SECTORS).concat(["ETF – Nasdaq-100","Other / unclassified","Cash"]);
+ mk("c-vs",{type:"bar",data:{labels:names,datasets:[{label:"Your portfolio",data:names.map(n=>(g[n]||0)/NLV*100),backgroundColor:C.you,borderRadius:3},{label:"S&P 500 (approx.)",data:names.map(n=>SP_SECTORS[n]||0),backgroundColor:"#d9c99a",borderRadius:3}]},
+  options:{maintainAspectRatio:false,plugins:{title:{display:true,text:"Sector weights: you vs S&P 500"},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(1)}%`}}},scales:{y:{ticks:{callback:v=>v+"%"}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
+}
+function narrative(){
+ const g=Object.fromEntries(group("sector")),pct=n=>((g[n]||0)/NLV*100),techComm=pct("Information Technology")+pct("Communication Services");
+ const w=[...H].sort((a,b)=>b.mv-a.mv),top5=w.slice(0,5).reduce((s,h)=>s+h.mv,0)/NLV*100;
+ const ps=A.per_symbol,top=ps.slice(0,5),bot=ps.filter(p=>p.pnl<0).sort((a,b)=>a.pnl-b.pnl).slice(0,5),topSum=top.reduce((s,p)=>s+p.pnl,0),botSum=bot.reduce((s,p)=>s+p.pnl,0);
+ const pk=SER.reduce((m,r)=>r.twr>m.twr?r:m,SER[0]),e=SER[SER.length-1];
+ const spec=["SOUN","CAVA","CMG","SNDK","SERV"],cut=new Date(new Date(END)-30*864e5).toISOString().slice(0,10),specT=A.trades.filter(t=>spec.includes(t.symbol)&&t.date>=cut);
+ const all=Object.values(SH),beat=all.filter(s=>S.actual_value>s.value),lost=all.filter(s=>S.actual_value<=s.value).sort((a,b)=>b.value-a.value);
+ const spy=SH.SPY;
+ const O=[
+  [spy&&S.actual_value>spy.value?"lo":"hi",spy&&S.actual_value>spy.value?"You beat the S&P 500"+(SH.QQQ&&S.actual_value>SH.QQQ.value?" and the Nasdaq-100":""):"The S&P 500 beat you",
+   spy?`With your exact trades, the same dollars in SPY would be worth ${fmt$(spy.value)}. Your portfolio is worth ${fmt$(S.actual_value)}, so ${S.actual_value>=spy.value?`<b>you're ahead by ${fmt$(S.actual_value-spy.value)}</b>`:`<b>the S&P 500 is ahead by ${fmt$(spy.value-S.actual_value)}</b>`}. Your yearly return on invested money (IRR) is ${fmtP(S.irr_you*100)} vs ${fmtP(spy.irr*100)}, and your time-weighted return is ${fmtP(S.twr_you*100)} vs ${fmtP(spy.twr*100)}.`:""],
+  ["in","Some single stocks would have beaten you",
+   lost.length?`Of the ${all.length} tickers compared, these would have done better than your portfolio: ${lost.map(s=>`<b>${s.ticker}</b> (${fmt$(s.value)}, ${sgn$(s.value-S.actual_value)})`).join(", ")}. You beat ${beat.map(s=>s.ticker).join(", ")}. Picking the single best stock afterwards is easy, but it's a much riskier bet than your diversified mix. See the Compare tab for drawdowns.`:`You beat every ticker compared so far (${beat.map(s=>s.ticker).join(", ")}).`],
+  ["in","Webull's 21.9% made you look worse than you are",`It's a simple return on cost basis, and most of your money is recent. See "Why Webull shows +21.9%" on the S&P 500 / Nasdaq tab.`],
+  ["md","More return came with more risk",`Your worst drop was ${fmtP(S.dd_you*100)}, vs ${fmtP(S.dd_spy*100)} for the S&P 500. Since your high on ${dfmt(pk.d)}, you're down ${fmtP((e.twr/pk.twr-1)*100)} vs ${fmtP((e.spy/pk.spy-1)*100)} for the S&P.`],
+  ["lo","A few big winners drove the result",`Your top 5 stocks by lifetime P&L (${top.map(p=>p.symbol).join(", ")}) made ${fmt$(topSum)}, which is ${(topSum/S.gain_you*100).toFixed(0)}% of your total gain of ${fmt$(S.gain_you)}. Your 5 worst (${bot.map(p=>p.symbol).join(", ")}) lost ${fmt$(botSum)}.`],
+  ["hi","Heavy concentration in tech",`${techComm.toFixed(0)}% of the account is in Information Technology plus Communication Services, vs about 43% in the S&P 500. Counting QQQ, it's about 80%. You hold no Health Care, Energy, Utilities, Real Estate or Materials stocks. Your top 5 positions make up ${top5.toFixed(0)}% of the account.`],
+  ["md","You still buy your losing speculative stocks automatically",`In the last 30 days you made ${specT.length} buys in ${[...new Set(specT.map(t=>t.symbol))].join(", ")||"none"}. That's fine if you still believe in them, but it blocks tax-loss harvesting because of the 30-day wash-sale rule.`],
+  ["lo","Your investing habit is very consistent",`${S.n_buys.toLocaleString()} buys averaging ${fmt$(S.total_bought/S.n_buys)}, with only ${S.n_sells} sells. Investing steadily like this (dollar-cost averaging) has worked well for you.`]
+ ].filter(o=>o[2]);
+ const R=[
+  ["hi","Judge yourself against an index, not Webull's %","Check the S&P 500 / Nasdaq tab every quarter (<code>./run.sh</code> refreshes it) and watch two numbers: the dollar lead and the time-weighted gap. Nearly 3 years is still short. The real test is a full market cycle."],
+  ["hi","Decide on purpose how much risk you're taking",`Your outperformance came from a concentrated bet on big tech and semiconductors (about ${techComm.toFixed(0)}% of the account). Make sure you could hold through a 35–40% drop. If not, an index core (VOO or VTI) holding part of each month's deposits would reduce swings.`],
+  ["md","Don't chase the single-stock winners on the Compare tab",`${lost.length?lost.map(s=>s.ticker).join(" or ")+" beating you":"A single stock beating you"} over these 3 years doesn't mean ${lost.length>1?"they":"it"} will over the next 3, and single stocks usually have deeper drops than a mix.`+" Use those comparisons to check your stock picks, not as a list of what to buy."],
+  ["md","Turn losers into tax savings (taxable account)","SOUN, CAVA, CMG, SNDK and SERV are down roughly $4.6k combined. If you no longer believe in them, <b>first stop their recurring buys</b>, then sell. The losses offset gains, plus up to $3k a year of income. Wait 30 days before buying any of them back."],
+  ["md","Cap each position and each theme","For example: no stock above 10% (GOOGL is at the limit), no theme above 25%. Point new deposits at names below their target instead of selling winners. In a taxable account, that avoids triggering taxes."],
+  ["md","Fill the sectors you don't own","Health Care, Industrials, Energy and Financials are roughly 35% of the S&P 500 and about 2.5% of your account. Adding one or two quality names or a sector ETF to your recurring buys would reduce your dependence on tech."],
+  ["lo","Clean up the very small positions","SPCX, SERV, SNDK and SOUN each hold under 1% of the account. Either build them up to a meaningful size or consolidate them."]
+ ];
+ const T={hi:["t-hi","Watch"],md:["t-md","Note"],lo:["t-lo","Positive"],in:["t-in","Insight"]},RT={hi:["t-hi","Priority"],md:["t-md","Consider"],lo:["t-lo","Habit"]};
+ $("obs").innerHTML=O.map(([p,h,t])=>`<div class="item"><h4><span class="tag ${T[p][0]}">${T[p][1]}</span>${h}</h4><p>${t}</p></div>`).join("");
+ $("recsList").innerHTML=R.map(([p,h,t])=>`<div class="item"><h4><span class="tag ${RT[p][0]}">${RT[p][1]}</span>${h}</h4><p>${t}</p></div>`).join("");
+}
+
+// ================= BENCHMARKS =================
+let benchT="SPY";
+function renderBench(){
+ document.querySelectorAll("#benchSeg button").forEach(b=>{b.classList.toggle("on",b.dataset.t===benchT);b.onclick=()=>{benchT=b.dataset.t;renderBench();};});
+ shadowView($("bench-view"),benchT,"bv");
+ if(!rendered.why){why();rendered.why=true;}
+}
+function why(){
+ const T=A.trades.filter(t=>t.side==="BUY"),end=new Date(END),tot=T.reduce((s,t)=>s+t.flow,0),days=t=>(end-new Date(t.date))/864e5;
+ const age=T.reduce((s,t)=>s+t.flow*days(t),0)/tot,lastY=T.filter(t=>days(t)<=365).reduce((s,t)=>s+t.flow,0),last6=T.filter(t=>days(t)<=182).reduce((s,t)=>s+t.flow,0),firstY=T.filter(t=>t.date<"2025-01-01").reduce((s,t)=>s+t.flow,0);
+ $("explain").innerHTML=`
+ <div class="box"><div style="color:var(--mute)">Average time your dollars have been invested</div><div class="big">${(age/30.4).toFixed(0)} months</div><div>The account is ${(S.years*12).toFixed(0)} months old, but a typical dollar has been invested for less than half that time.</div></div>
+ <div class="box"><div style="color:var(--mute)">Dollars invested in the last 12 months</div><div class="big">${fmt$(lastY)} <small style="font-size:16px;color:var(--mute)">(${(lastY/tot*100).toFixed(0)}%)</small></div><div>${fmt$(last6)} of it in the last 6 months. Only ${fmt$(firstY)} went in during 2024, the period with the biggest gains.</div></div>
+ <div class="box"><div style="color:var(--mute)">So the measures say different things</div><div style="margin-top:4px">Simple return (Webull): <b>${fmtP(P.unrealized_pnl/(P.market_value-P.unrealized_pnl)*100)}</b><br>Return on your money, timing included (IRR): <b>${fmtP(S.irr_you*100)}/yr</b><br>Time-weighted, timing removed: <b>${fmtP(S.twr_you*100)}</b><br><span style="color:var(--mute);font-size:13px">To judge your picks against an index, use the time-weighted number or the dollar-for-dollar shadow. Webull's simple return isn't comparable.</span></div></div>`;
+ const q={};T.forEach(t=>{const d=new Date(t.date),k=d.getFullYear()+" Q"+(Math.floor(d.getMonth()/3)+1);q[k]=(q[k]||0)+t.flow;});const ks=Object.keys(q);let c=0;
+ mk("c-age",{type:"bar",data:{labels:ks,datasets:[{label:"Invested that quarter",data:ks.map(k=>q[k]),backgroundColor:C.you,borderRadius:3},{type:"line",label:"Cumulative % of all money invested",data:ks.map(k=>(c+=q[k])/tot*100),borderColor:"#e07b39",yAxisID:"y1",pointRadius:3}]},
+  options:{maintainAspectRatio:false,plugins:{title:{display:true,text:"When your money went in"},tooltip:{callbacks:{label:c=>c.dataset.yAxisID==="y1"?`${c.dataset.label}: ${c.parsed.y.toFixed(0)}%`:`${c.dataset.label}: ${fmt$(c.parsed.y)}`}}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>fmt$(v)}},y1:{position:"right",min:0,max:100,grid:{display:false},ticks:{callback:v=>v+"%"}}}}});
+}
+
+// ================= COMPARE =================
+let cmpT=null;
+function renderCompare(){
+ chips();board();
+ $("tform").onsubmit=e=>{e.preventDefault();const t=$("tin").value.trim().toUpperCase();if(t)selectTicker(t);};
+ if(!cmpT){const q=new URLSearchParams(location.hash.split("?")[1]||"");selectTicker(q.get("t")||BLUE[0]);}
+}
+function chips(){
+ const uni=new Set(SX?Object.keys(SX.rows):[]);
+ const extra=Object.keys(SH).filter(t=>!BLUE.includes(t)&&t!=="SPY"&&t!=="QQQ"&&(!uni.has(t)||t===cmpT||H.some(h=>h.s===t)));
+ $("chips").innerHTML=BLUE.concat(extra).map(t=>{const s=SH[t];const df=s?S.actual_value-s.value:0,sub=s?(df>=0?`<span class="pos">You're ahead by ${fmt$(df)}</span>`:`<span class="neg">${t} ahead by ${fmt$(-df)}</span>`):"not run yet";
+  return `<button class="chip${t===cmpT?" on":""}" data-t="${t}">${t}<small>${sub}</small></button>`;}).join("");
+ $("chips").insertAdjacentHTML("beforeend",`<a href="#/sectors" style="align-self:center;font-size:13px;color:var(--mute);margin-left:4px">+ ${uni.size} sector ETFs &amp; stocks on Re-orient (or type one below)</a>`);
+ $("chips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>selectTicker(b.dataset.t));
+}
+function msg(html,cls="note"){$("cmsg").innerHTML=html?`<div class="${cls}">${html}</div>`:"";}
+async function selectTicker(t){
+ t=t.toUpperCase();
+ if(!/^\^?[A-Z0-9][A-Z0-9.\-=]{0,14}$/.test(t)){msg(`“${esc(t)}” doesn't look like a valid ticker.`,"note err");return;}
+ cmpT=t;$("tin").value="";
+ const wantHash="#/compare?t="+t;if(location.hash!==wantHash)history.replaceState(null,"",wantHash);
+ if(!SH[t]||LIVE&&isStale(SH[t])){
+  if(!LIVE&&DEMO){chips();msg(SH[t]?"":`<b>${esc(t)}</b> isn't in this demo's precomputed set. Pick one of the tickers above or on the Re-orient page. Running <a href="${REPO}" target="_blank" rel="noopener">Pecunia</a> locally analyzes any ticker on demand.`,"note warn");return;}
+  if(!LIVE){chips();msg(SH[t]?"":`<b>${esc(t)}</b> hasn't been analyzed yet. To analyze any ticker, start the local app with <code>./serve.sh</code> and open this page from there, or run <code>uv run python scripts/shadow.py ${esc(t)}</code> and then <code>uv run python scripts/build_report.py</code>.`,"note warn");if(!SH[t]){$("cmp-view").innerHTML="";return;}}
+  else{
+   $("trun").disabled=true;msg(`Running shadow analysis for <b>${esc(t)}</b>… (fetching prices and replaying ${S.n_trades.toLocaleString()} trades)`);
+   try{const r=await fetch("/api/shadow?t="+encodeURIComponent(t)),j=await r.json();if(!r.ok)throw new Error(j.error||r.statusText);SH[t]=j;}
+   catch(e){msg(`Couldn't analyze <b>${esc(t)}</b>: ${esc(e.message)}`,"note err");$("trun").disabled=false;chips();return;}
+   $("trun").disabled=false;
+  }
+ }
+ msg("");chips();board();
+ shadowView($("cmp-view"),t,"cv");
+}
+function isStale(s){return s.end!==END;}
+function board(){
+ const rows=[{t:"YOU",name:"Your portfolio",value:S.actual_value,gain:S.gain_you,irr:S.irr_you,twr:S.twr_you,dd:S.dd_you}].concat(Object.values(SH).map(s=>({t:s.ticker,name:s.name,value:s.value,gain:s.gain,irr:s.irr,twr:s.twr,dd:s.dd,late:s.late_start}))).sort((a,b)=>b.value-a.value);
+ $("board").innerHTML=`<thead><tr><th class="l">#</th><th class="l">Ticker</th><th class="l">Name</th><th>Value today</th><th>Gain</th><th>IRR</th><th>Time-weighted</th><th>Worst drop</th><th>Who's ahead</th></tr></thead><tbody>`+
+  rows.map((r,i)=>`<tr class="${r.t==="YOU"?"me":"click"}" data-t="${r.t}"><td class="l">${i+1}</td><td class="l"><b>${r.t==="YOU"?"★ You":r.t}</b>${r.late?' <small title="started trading after your first deposit">*</small>':""}</td><td class="l">${esc(r.name)}</td><td>${fmt$(r.value)}</td><td class="${cls(r.gain)}">${sgn$(r.gain)}</td><td>${r.irr==null?"—":fmtP(r.irr*100)}</td><td>${fmtP(r.twr*100)}</td><td class="neg">${fmtP(r.dd*100)}</td><td>${r.t==="YOU"?"":ahead(S.actual_value-r.value,r.t)}</td></tr>`).join("")+"</tbody>";
+ $("board").querySelectorAll("tr.click").forEach(tr=>tr.onclick=()=>{const t=tr.dataset.t;if(t==="SPY"||t==="QQQ"){benchT=t;go("benchmarks");if(rendered.benchmarks)renderBench();}else{selectTicker(t);scrollTo({top:0,behavior:"smooth"});}});
+}
+
+// ================= DATA =================
+// ================= sectors / re-orient page =================
+const SXS={end:0,sec:0,mix:{}};
+const PRESETS=[["Your actual portfolio",{}],["+ 40% sector ETFs (health, staples, banks, energy)",{XLV:.1,XLP:.1,XLF:.1,XLE:.1}],["+ 40% top-scored stocks",{JNJ:.08,WMT:.08,JPM:.08,RTX:.08,XOM:.08}],["30% S&P 500 core + 30% sector ETFs",{SPY:.3,XLV:.1,XLP:.1,XLF:.1}],["Half in defensive ETFs",{XLV:.125,XLP:.125,XLF:.125,XLE:.125}]];
+function lumpOrDca(idx,si,ei,amt,mode){
+ if(mode==="lump"){let i=si;while(i<=ei&&idx[i]==null)i++;if(i>ei)return null;return {inv:amt,val:amt*idx[ei]/idx[i]};}
+ let u=0,inv=0,lastM="";for(let i=si;i<=ei;i++){const m=SER[i].d.slice(0,7);if(m!==lastM&&idx[i]!=null){u+=amt/idx[i];inv+=amt;lastM=m;}}return inv?{inv,val:u*idx[ei]}:null;
+}
+function pathStats(vals,ei){const r=[];let tw=1,pk=1,dd=0;for(let i=1;i<=ei;i++){const f=SER[i].inv-SER[i-1].inv,b=vals[i-1]+f;const x=b>1?vals[i]/b:1;tw*=x;r.push(x-1);pk=Math.max(pk,tw);dd=Math.min(dd,tw/pk-1);}const m=r.reduce((a,b)=>a+b,0)/r.length,sd=Math.sqrt(r.reduce((a,b)=>a+(b-m)**2,0)/(r.length-1));return {dd,vol:sd*Math.sqrt(252),tw:tw-1};}
+function mixVals(mix,ei){const w=Object.values(mix).reduce((a,b)=>a+b,0),out=[];for(let i=0;i<=ei;i++){let v=(1-w)*SER[i].v;for(const t in mix)v+=mix[t]*SH[t].vals[i];out.push(v);}return out;}
+function renderSect(){
+ if(!SX){$("sxk").innerHTML=`<div class="note warn">Run <code>uv run python scripts/sector_lab.py</code> then <code>scripts/build_report.py</code>.</div>`;return;}
+ const sl=$("sxEnd"),N=SER.length-1;sl.min=60;sl.max=N;sl.value=SXS.end||N;
+ const spyI=SH.SPY.idx;let pk=0;spyI.forEach((x,i)=>{if(x>spyI[pk])pk=i;});
+ const y25=SER.map(r=>r.d).lastIndexOf(SER.filter(r=>r.d<"2026").slice(-1)[0].d);
+ const setEnd=i=>{SXS.end=+i;sl.value=i;sxAll();};
+ sl.oninput=()=>setEnd(sl.value);$("sxToday").onclick=()=>setEnd(N);$("sxPeak").onclick=()=>setEnd(pk);$("sxY25").onclick=()=>setEnd(y25);
+ $("sxSecs").innerHTML=SX.sectors.map((s,i)=>`<button data-i="${i}">${esc(s.name)}</button>`).join("");
+ $("sxSecs").querySelectorAll("button").forEach(b=>b.onclick=()=>{SXS.sec=+b.dataset.i;sxPicks();});
+ $("sxStart").value=SER[0].d;$("sxStart").min=SER[0].d;$("sxStart").max=END;
+ ["sxAmt","sxMode","sxStart"].forEach(id=>$(id).oninput=sxPicks);
+ $("sxPresets").innerHTML=PRESETS.map((p,i)=>`<button data-i="${i}">${esc(p[0])}</button>`).join("");
+ $("sxPresets").querySelectorAll("button").forEach(b=>b.onclick=()=>{SXS.mix={...PRESETS[+b.dataset.i][1]};$("sxPresets").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));sxMix();});
+ $("sxPresets").querySelector("button[data-i='1']").click();
+ const all=Object.keys(SX.rows).sort();$("sxAdd").innerHTML=all.map(t=>`<option value="${t}">${t} · ${esc(shortName(t))}</option>`).join("");
+ $("sxAddBtn").onclick=()=>{const t=$("sxAdd").value;if(!(t in SXS.mix))SXS.mix[t]=.05;sxMix();};
+ SXS.end=N;sxAll();sxRecs();
+}
+function sxAll(){
+ const e=SXS.end,r=SER[e];$("sxEndLbl").textContent=dfmt(r.d)+(e===SER.length-1?" (latest)":"");
+ const you=pathStats(SER.map(x=>x.v),e),spy=pathStats(SH.SPY.vals,e);
+ const etfs=SX.sectors.map(s=>s.etf),beat=etfs.filter(t=>SH[t].vals[e]>r.v);
+ $("sxk").innerHTML=kpi(`Your portfolio on ${dfmt(r.d)}`,fmt$(r.v),`${fmt$(r.inv)} invested · gain ${sgn$(r.v-r.inv)}`,"",true)
+  +kpi("How bumpy your ride was",`${(you.vol*100).toFixed(0)}% volatility`,`S&P 500: ${(spy.vol*100).toFixed(0)}% · your worst drop ${fmtP(you.dd*100)} vs ${fmtP(spy.dd*100)}`)
+  +kpi("How closely you track tech (XLK)",SX.rows.XLK.corr.toFixed(2),"1.00 = moves in lockstep. Your portfolio is effectively a tech fund.")
+  +kpi("Sector ETFs that beat you by this date",`${beat.length} of ${etfs.length}`,beat.length?beat.join(", "):"None of them");
+ $("sxEtf").innerHTML=`<thead><tr><th class="l">Sector</th><th class="l">ETF</th><th>All in: value</th><th>Who's ahead</th><th>Return /yr</th><th>Volatility</th><th>Worst drop</th><th>Moves with you</th><th>20% sleeve: effect on you</th><th>20% sleeve: your worst drop</th></tr></thead><tbody>`+
+  SX.sectors.map(s=>{const t=s.etf,R=SX.rows[t],v=SH[t].vals[e],sv=.8*r.v+.2*v,ps=pathStats(mixVals({[t]:.2},e),e);
+   return `<tr><td class="l">${esc(s.name)}</td><td class="l"><b>${t}</b></td><td>${fmt$(v)}</td><td>${ahead(r.v-v,t)}</td><td>${pc(R.ann)}</td><td>${(R.vol*100).toFixed(0)}%</td><td class="neg">${pc(R.dd)}</td><td>${corrCell(R.corr)}</td><td>${eff(sv-r.v)}</td><td>${pc(ps.dd)} <small style="color:var(--mute)">(you ${pc(you.dd)})</small></td></tr>`;}).join("")+"</tbody>";
+ sxPicks();sxMix();
+}
+const corrCell=c=>`<span style="white-space:nowrap"><span style="display:inline-block;width:46px;height:8px;border-radius:4px;background:#e8ecf3;vertical-align:1px;margin-right:6px;overflow:hidden"><i style="display:block;height:100%;width:${Math.max(0,c)*100}%;background:${c>.6?"#c8372d":c>.3?"#d98a1c":"#13865a"}"></i></span>${c.toFixed(2)}</span>`;
+function sxPicks(){
+ const sec=SX.sectors[SXS.sec],e=SXS.end,amt=Math.max(+$("sxAmt").value||0,0),mode=$("sxMode").value;
+ $("sxSecs").querySelectorAll("button").forEach((b,i)=>b.classList.toggle("on",i===SXS.sec));
+ let si=SER.findIndex(r=>r.d>=($("sxStart").value||SER[0].d));if(si<0||si>=e)si=0;
+ const yk=SX.year_keys,list=[sec.etf,...sec.ranked],youTw=SER.map(r=>r.twr),yr=lumpOrDca(youTw,si,e,amt,mode);
+ $("sxCalcNote").textContent=`${fmt$(amt)} ${mode==="lump"?"once":"every month"} from ${dfmt(SER[si].d)} to ${dfmt(SER[e].d)}${yr?` · your own picks would be worth ${fmt$(yr.val)}`:""}`;
+ $("sxPicks").innerHTML=`<thead><tr><th class="l">#</th><th class="l">Ticker</th><th>Score</th><th>Your ${fmt$(amt)}${mode==="dca"?"/mo":""} → value</th><th>Gain</th><th>Who's ahead</th><th>Return /yr</th><th>Volatility</th><th>Worst drop</th><th>Moves with you</th>${yk.map(y=>`<th>${y}${y===yk[yk.length-1]?" YTD":""}</th>`).join("")}<th>Beat S&amp;P</th></tr></thead><tbody>`+
+  `<tr class="me"><td class="l"></td><td class="l">★ Your picks</td><td></td><td>${yr?fmt$(yr.val):"–"}</td><td class="${yr?cls(yr.val-yr.inv):""}">${yr?sgn$(yr.val-yr.inv):"–"}</td><td></td><td>${pc(SX.you.ann)}</td><td>${(SX.you.vol*100).toFixed(0)}%</td><td class="neg">${pc(SX.you.dd)}</td><td>1.00</td>${yk.map(y=>`<td>${pc(SX.you.years[y])}</td>`).join("")}<td></td></tr>`+
+  list.map((t,i)=>{const R=SX.rows[t],c=lumpOrDca(SH[t].idx,si,e,amt,mode),etf=i===0;
+   return `<tr class="click" data-t="${t}"><td class="l">${etf?"ETF":i}</td><td class="l"><b>${t}</b> <small style="color:var(--mute)">${esc(shortName(t))}</small>${!etf&&i<=2?' <span class="tag t-lo">top pick</span>':""}</td><td>${etf?"":`<b>${R.score>=0?"+":""}${R.score.toFixed(2)}</b>`}</td><td>${c?fmt$(c.val):"–"}</td><td class="${c?cls(c.val-c.inv):""}">${c?sgn$(c.val-c.inv):"–"}</td><td>${c&&yr?ahead(yr.val-c.val,t):"–"}</td><td>${pc(R.ann)}</td><td>${(R.vol*100).toFixed(0)}%</td><td class="neg">${pc(R.dd)}</td><td>${corrCell(R.corr)}</td>${yk.map(y=>`<td class="${R.years[y]>SX.spy_years[y]?"pos":""}">${pc(R.years[y])}</td>`).join("")}<td>${R.beat}/${yk.length}</td></tr>`;}).join("")+"</tbody>";
+ $("sxPicks").querySelectorAll("tr.click").forEach(tr=>tr.onclick=()=>go("compare?t="+tr.dataset.t));
+}
+function sxMix(){
+ const e=SXS.end,M=SXS.mix,w=Object.values(M).reduce((a,b)=>a+b,0);
+ $("sxMix").innerHTML=Object.entries(M).map(([t,x])=>`<div class="item" style="padding:8px 12px"><div style="display:flex;justify-content:space-between;align-items:center"><b>${t} <small style="color:var(--mute);font-weight:500">${esc(shortName(t))}</small></b><span><b>${Math.round(x*100)}%</b> <a href="#" data-x="${t}" style="color:var(--neg);text-decoration:none;margin-left:6px">✕</a></span></div><input type="range" min="0" max="100" step="1" value="${Math.round(x*100)}" data-t="${t}" style="width:100%;padding:0"></div>`).join("")||`<p style="color:var(--mute)">No changes: this is your actual portfolio.</p>`;
+ $("sxMix").querySelectorAll("input").forEach(inp=>inp.oninput=()=>{const t=inp.dataset.t,others=Object.entries(SXS.mix).filter(([k])=>k!==t).reduce((a,[,v])=>a+v,0);SXS.mix[t]=Math.min(+inp.value/100,1-others);sxMix();});
+ $("sxMix").querySelectorAll("a[data-x]").forEach(a=>a.onclick=ev=>{ev.preventDefault();delete SXS.mix[a.dataset.x];sxMix();});
+ $("sxRest").textContent=`${Math.round((1-w)*100)}% of every deposit stays in the stocks you actually bought.`;
+ const mv=mixVals(M,e),ms=pathStats(mv,e),ys=pathStats(SER.map(r=>r.v),e),sp=pathStats(SH.SPY.vals,e),r=SER[e];
+ $("sxMixK").innerHTML=kpi("This mix",fmt$(mv[e]),`gain ${sgn$(mv[e]-r.inv)} on ${fmt$(r.inv)}`,"",true)
+  +(mv[e]>=r.v?kpi("This mix beats your actual portfolio by",fmt$(mv[e]-r.v),`your actual: ${fmt$(r.v)}`,"pos"):kpi("Your actual portfolio beats this mix by",fmt$(r.v-mv[e]),`your actual: ${fmt$(r.v)}`,"neg"))
+  +kpi("Worst drop",`${pc(ms.dd)}`,`actual ${pc(ys.dd)} · S&P 500 ${pc(sp.dd)}`,ms.dd>=ys.dd?"pos":"neg")
+  +kpi("Volatility",`${(ms.vol*100).toFixed(0)}%`,`actual ${(ys.vol*100).toFixed(0)}% · S&P 500 ${(sp.vol*100).toFixed(0)}%`,ms.vol<=ys.vol?"pos":"neg");
+ const L=SER.slice(0,e+1).map(x=>x.d);
+ mk("sxChart",{type:"line",data:{labels:L,datasets:[{label:"This mix",data:mv,borderColor:"#13865a",borderWidth:2,pointRadius:0},{label:"Your actual portfolio",data:SER.slice(0,e+1).map(x=>x.v),borderColor:C.you,borderWidth:2,pointRadius:0},{label:"All in S&P 500",data:SH.SPY.vals.slice(0,e+1),borderColor:C.ref,borderWidth:1.5,pointRadius:0},{label:"Invested",data:SER.slice(0,e+1).map(x=>x.inv),borderColor:C.inv,borderDash:[4,4],borderWidth:1,pointRadius:0}]},options:lineOpts(v=>fmt$(v))});
+}
+function sxRecs(){
+ const R=SX.rows,N=SER.length-1,spyI=SH.SPY.idx;let pk=0;spyI.forEach((x,i)=>{if(x>spyI[pk])pk=i;});
+ const at=(mix,e)=>mixVals(mix,e)[e]-SER[e].v,etf40=PRESETS[1][1],top40=PRESETS[2][1];
+ const s1=pathStats(mixVals(etf40,N),N),y1=pathStats(SER.map(r=>r.v),N);
+ const items=[
+  ["t-hi","Your real risk is one bet, not too few stocks",`You own ${P?Object.keys(P.positions).length:"~25"} stocks, but your daily returns move ${SX.rows.XLK.corr.toFixed(2)} in step with the tech ETF (XLK) and only ${R.XLV.corr.toFixed(2)} with healthcare, ${R.XLP.corr.toFixed(2)} with staples and ${R.XLE.corr.toFixed(2)} with energy. That's why you dropped ${pc(SX.you.dd)} at your worst vs ${pc(R.SPY.dd)} for the S&P 500, and why the November AI sell-off hit you so hard.`],
+  ["t-in","The honest answer depends on the date",`At the S&P 500 peak (${dfmt(SER[pk].d)}), putting 40% of every deposit into the four defensive sector ETFs would have left you with ${eff(at(etf40,pk))}. Today the gap is ${eff(at(etf40,N))}. Your tech-heavy picks won big in the rally and gave a lot back in the sell-off. Diversifying wouldn't have made you more money over this period. It would have made the ride smoother: volatility ${(s1.vol*100).toFixed(0)}% instead of ${(y1.vol*100).toFixed(0)}%, worst drop ${pc(s1.dd)} instead of ${pc(y1.dd)}.`],
+  ["t-lo","Healthcare and staples were the best diversifiers",`XLV (healthcare) as a 20% sleeve would leave you with ${eff(at({XLV:.2},N))} today while barely moving with your stocks (correlation ${R.XLV.corr.toFixed(2)}). Within healthcare, JNJ (score ${R.JNJ.score.toFixed(2)}) and ABBV (${R.ABBV.score.toFixed(2)}) had shallow drops and almost no link to your portfolio. LLY returned the most but fell ${pc(R.LLY.dd)} at its worst. In staples, WMT (${R.WMT.score.toFixed(2)}) and PM (${R.PM.score.toFixed(2)}) beat the S&P 500 in all 3 years, and KO's correlation with you was negative (${R.KO.corr.toFixed(2)}).`],
+  ["t-md","Banks: JPM and Berkshire, but they won't diversify you much",`Financials move more with your portfolio (XLF ${R.XLF.corr.toFixed(2)}, GS ${R.GS.corr.toFixed(2)}) because they also do well in risk-on markets. JPM led on return, and BRK.B had the smallest drop in the group (${pc(R["BRK.B"].dd)}) with low correlation (${R["BRK.B"].corr.toFixed(2)}). Your AXP holding was the weakest card company this year (${pc(R.AXP.years[SX.year_keys[SX.year_keys.length-1]])} YTD).`],
+  ["t-md","Energy and defense were the surprise hedges",`As a 20% sleeve, XLE would leave you with ${eff(at({XLE:.2},N))} today${(()=>{const w=SX.sectors.map(x=>x.etf).filter(t=>at({[t]:.2},N)>0);return w.length?` (sector ETFs that would have added money: ${w.join(", ")})`:" (no sector ETF would have added money)";})()}, and XOM/CVX had near-zero correlation with you. RTX beat the S&P 500 in all 3 years. Energy is cyclical, though: it lagged in 2024 and spiked in 2026 on the Iran conflict. Treat it as a small hedge, not a growth engine.`],
+  ["t-in","Consumer goods: WMT yes, COST and AAPL less so",`As a 20% sleeve, WMT would leave you with ${eff(at({WMT:.2},N))} and COST with ${eff(at({COST:.2},N))}. COST fell in 2025. AAPL is classed as tech, and its correlation with you (${R.AAPL.corr.toFixed(2)}) is high, so it adds return without much diversification. Skip PEP, MCD and HD: they lost money over this period.`],
+  ["t-lo","A data-backed way to re-orient (example, not personal advice)",`Keep investing in your picks, but route new money so that 30–40% goes to things that don't move with tech. For example: 10% XLV or JNJ/ABBV, 10% WMT/KO or XLP, 10% JPM/BRK.B, 5–10% XLE/RTX. Backtested on your exact deposits, 40% top-scored stocks would leave you with ${eff(at(top40,N))} today, and 40% sector ETFs with ${eff(at(etf40,N))}, both with a worst drop around ${pc(s1.dd)}. Prefer the ETFs if you don't want to depend on which single stocks happened to win. Redirecting new deposits avoids selling and triggering taxable gains.`],
+  ["t-hi","Watch out for hindsight",`Picks are scored on this period only. UNH had been a "safe" healthcare stock for decades and fell ${pc(R.UNH.dd)}. This page doesn't use valuations (P/E), earnings outlook or dividend safety, so check those before buying. Diversification works because you can't know in advance which sector leads next.`]];
+ $("sxRecs").innerHTML=items.map(([c,h,p])=>`<div class="item"><h4><span class="tag ${c}">${{"t-hi":"Key","t-md":"Note","t-lo":"Idea","t-in":"Insight"}[c]}</span>${h}</h4><p>${p}</p></div>`).join("");
+}
+
+// ================= dips page =================
+const mlab=m=>new Date(m+"-15T12:00").toLocaleDateString(undefined,{month:"short",year:"numeric"});
+const pc=(x,d=1)=>x==null?"–":fmtP(x*100,d);
+let dSort="ret";
+function renderDips(){
+ if(!DP){$("dkpis").innerHTML=`<div class="note warn">No dip analysis yet. Run <code>uv run python scripts/dip_analysis.py</code>, then <code>scripts/build_report.py</code>.</div>`;return;}
+ const T=DP.total,D=DP.dip,B=DP.buckets,hi=B[0],best=[...DP.months].sort((a,b)=>b.ret-a.ret)[0],bigG=[...DP.months].sort((a,b)=>b.gain-a.gain)[0];
+ $("dkpis").innerHTML=kpi("Total timing edge",sgn$(T.edge),`${pc(T.edge_pct)} on ${fmt$(T.cost)} of buys vs paying the 3-month average price`,cls(T.edge),true)
+  +kpi("Dollars bought in dips (S&P ≥5% off)",fmt$(D.cost),`${(D.cost/T.cost*100).toFixed(0)}% of buys · timing edge ${sgn$(D.edge)}`)
+  +kpi("Next 6 months: dip buys vs near-high buys",`${pc(D.f6)} vs ${pc(hi.f6)}`,"dollar-weighted return over the following 6 months",cls(D.f6-hi.f6))
+  +kpi("Best month by return",mlab(best.m),`${pc(best.ret)} · biggest $ gain: ${mlab(bigG.m)} (${sgn$(bigG.gain)})`);
+ const M=DP.months,dd=new Map(DP.spy_dd),mdd={};DP.spy_dd.forEach(([d,v])=>{const k=d.slice(0,7);mdd[k]=Math.max(mdd[k]||0,v);});
+ mk("dchart",{data:{labels:M.map(m=>mlab(m.m)),datasets:[
+  {type:"bar",label:"Invested",data:M.map(m=>m.cost),backgroundColor:M.map(m=>retColor(m.ret*100)),yAxisID:"y",order:2},
+  {type:"line",label:"S&P 500 worst point that month (below 52-wk high)",data:M.map(m=>-(mdd[m.m]||0)*100),borderColor:C.bench,backgroundColor:C.bench,pointRadius:2,borderWidth:2,yAxisID:"y2",order:1}]},
+  options:{maintainAspectRatio:false,interaction:{mode:"index",intersect:false},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:18}},y:{position:"left",ticks:{callback:v=>fmt$(v)},title:{display:true,text:"Invested"}},y2:{position:"right",max:0,grid:{display:false},ticks:{callback:v=>v+"%"},title:{display:true,text:"S&P 500 below high"}}},
+  plugins:{tooltip:{callbacks:{label:c=>{const m=M[c.dataIndex];return c.datasetIndex?`S&P 500 low that month: ${c.parsed.y.toFixed(1)}% below high`:`Invested ${fmt$(m.cost)} → ${fmt$(m.value)} (${pc(m.ret)}; S&P ${pc(m.spy_ret)})`;}}}}}});
+ document.querySelectorAll("#dsort button").forEach(b=>b.onclick=()=>{dSort=b.dataset.k;document.querySelectorAll("#dsort button").forEach(x=>x.classList.toggle("on",x===b));dMonths();});
+ dMonths();
+ const bt=rows=>`<thead><tr><th class="l">When you bought</th><th>Invested</th><th>Next 3 mo</th><th>Next 6 mo</th><th>To date</th><th>Timing edge</th></tr></thead><tbody>`+rows.map(b=>`<tr><td class="l">${esc(b.label)}</td><td>${fmt$(b.cost)}</td><td class="${cls(b.f3)}">${pc(b.f3)}</td><td class="${cls(b.f6)}">${pc(b.f6)}</td><td>${pc(b.ret)}</td><td class="${cls(b.edge)}">${sgn$(b.edge)} <small style="color:var(--mute)">(${pc(b.edge_pct)})</small></td></tr>`).join("")+"</tbody>";
+ $("dbk").innerHTML=bt(B);$("dsbk").innerHTML=bt(DP.stock_buckets);
+ const cor=B[B.length-1],gainYou=S.gain_you;
+ $("dnote").innerHTML=`<b>Bottom line:</b> buying when prices were down added about <b>${sgn$(T.edge)}</b> overall, roughly ${(T.edge/gainYou*100).toFixed(0)}% of your ${fmt$(gainYou)} total gain. Almost all of it came from the ${fmt$(D.cost)} bought while the S&amp;P 500 was 5% or more below its high (${sgn$(D.edge)}). Buys made near market highs (${fmt$(hi.cost)}, ${(hi.cost/T.cost*100).toFixed(0)}% of your money) were slightly negative (${sgn$(hi.edge)}). Dollars invested during corrections returned ${pc(cor.f6)} over the next 6 months, compared with ${pc(hi.f6)} for near-high buys.<br><br><b>Keep in mind:</b> in 2024–2026 every dip recovered fast, so dip buying looks great in hindsight. That isn't true of every sell-off (2000–02 and 2008 kept falling for over a year). Your near-high dollars still earned money: staying invested mattered more than timing. The current sell-off is still in progress, so its row will keep changing.`;
+ $("deps").innerHTML=[...DP.episodes].reverse().map(e=>{const n=e.news||{},open=!e.end;return `<div class="item"><h4><span class="tag ${e.depth>=.1?"t-hi":"t-md"}">−${(e.depth*100).toFixed(1)}%</span>${esc(n.title||"S&P 500 drawdown")}${open?' <span class="tag t-in">ongoing</span>':""}</h4>
+  <p style="color:var(--mute);font-size:13px;margin-bottom:6px">${dfmt(e.start)} → low ${dfmt(e.trough)} → ${open?"not yet recovered":"recovered "+dfmt(e.end)}</p>
+  <p>${esc(n.why||"")}</p>
+  <p style="margin-top:8px;font-size:14px"><b>You bought ${fmt$(e.cost)}</b> (${e.n} trades) · next 6 months <b class="${cls(e.f6??0)}">${pc(e.f6)}</b> · to date <b class="${cls(e.ret)}">${pc(e.ret)}</b> (S&amp;P ${pc(e.spy_ret)}) · timing edge <b class="${cls(e.edge)}">${sgn$(e.edge)}</b></p></div>`;}).join("");
+ $("dbig").innerHTML=`<thead><tr><th class="l">Date</th><th>S&amp;P 500</th><th class="l">Why</th><th>You bought (next 3d)</th><th>Next 3 mo</th></tr></thead><tbody>`+[...DP.big_days].reverse().map(b=>`<tr><td class="l" style="white-space:nowrap">${dfmt(b.d)}</td><td class="neg">${pc(b.chg)}</td><td class="l" style="font-size:13px">${esc(b.news||"")}</td><td>${b.n?fmt$(b.cost):"–"}</td><td class="${b.f3==null?"":cls(b.f3)}">${pc(b.f3)}</td></tr>`).join("")+"</tbody>";
+}
+function dMonths(){
+ const M=[...DP.months].sort((a,b)=>dSort==="m"?a.m.localeCompare(b.m):b[dSort]-a[dSort]),mx=Math.max(...M.map(m=>m.cost));
+ $("dmonths").innerHTML=`<thead><tr><th class="l">Month</th><th>Invested</th><th class="l"></th><th>Value now</th><th>Gain</th><th>Return</th><th>Same $ in S&amp;P 500</th><th>S&amp;P below high (avg)</th><th>Timing edge</th></tr></thead><tbody>`+M.map(m=>`<tr><td class="l">${mlab(m.m)}</td><td>${fmt$(m.cost)}</td><td class="l"><div class="bar"><i style="width:${m.cost/mx*100}%"></i></div></td><td>${fmt$(m.value)}</td><td class="${cls(m.gain)}">${sgn$(m.gain)}</td><td class="${cls(m.ret)}"><b>${pc(m.ret)}</b></td><td class="${cls(m.spy_ret)}">${pc(m.spy_ret)}</td><td>${m.mkt_dd>=.05?"<b>":""}${(m.mkt_dd*100).toFixed(1)}%${m.mkt_dd>=.05?"</b>":""}</td><td class="${cls(m.edge)}">${sgn$(m.edge)}</td></tr>`).join("")+"</tbody>";
+}
+
+function renderData(){
+ document.querySelectorAll(".endd").forEach(e=>e.textContent=dfmt(END));
+ $("tq").oninput=tlog;$("tside").onchange=tlog;tlog();
+ $("mv-rebuilt").textContent=fmt$(S.holdings_value);$("mv-webull").textContent=fmt$(P.market_value);
+ const L=S.legacy_sells||[];
+ $("legacy").textContent=L.length?`${L.length} sells of ${[...new Set(L.map(t=>t.symbol))].join(", ")} (${fmt$(L.reduce((s,t)=>s-t.flow,0),2)} total). Those shares never show up as buys in this history and look like Webull sign-up free stock.`:"Nothing.";
+ const R=A.reconciliation.filter(r=>r.webull||Math.abs(r.rebuilt)>1e-6),ok=R.filter(r=>Math.abs(r.diff)<=0.01).length;
+ $("recon-sum").textContent=`${ok} of ${R.length} positions match Webull within 0.01 shares. Net value of all differences: ${fmt$(S.recon_value_gap,2)}.`;
+ $("recon").innerHTML=`<thead><tr><th class="l">Symbol</th><th>Rebuilt shares</th><th>Webull shares</th><th>Difference</th><th>≈ $</th></tr></thead><tbody>`+R.map(r=>`<tr><td class="l">${r.symbol}</td><td>${r.rebuilt}</td><td>${r.webull}</td><td class="${Math.abs(r.diff)<=0.01?"":"neg"}">${r.diff}</td><td>${fmt$(r.diff*r.px,2)}</td></tr>`).join("")+"</tbody>";
+}
+function tlog(){
+ const q=$("tq").value.trim().toUpperCase(),sd=$("tside").value,rows=A.trades.filter(t=>(!sd||t.side===sd)&&(!q||t.symbol.includes(q)||t.date.includes(q))).slice().reverse();
+ $("tcount").textContent=`${rows.length.toLocaleString()} trades · ${fmt$(rows.reduce((s,t)=>s+t.flow,0))} net`;
+ $("tlog").innerHTML=`<thead><tr><th class="l">Date</th><th class="l">Symbol</th><th class="l">Side</th><th>Qty</th><th>Price</th><th>Amount</th></tr></thead><tbody>`+rows.slice(0,500).map(t=>`<tr><td class="l">${t.date}</td><td class="l"><b>${t.symbol}</b></td><td class="l ${t.side==="BUY"?"":"neg"}">${t.side}</td><td>${t.qty}</td><td>${fmt$(t.price,2)}</td><td>${fmt$(Math.abs(t.flow),2)}</td></tr>`).join("")+(rows.length>500?`<tr><td class="l" colspan="6" style="color:var(--mute)">Showing latest 500. Filter to narrow down.</td></tr>`:"")+"</tbody>";
+}
+
+// ================= refresh =================
+let rTimer=null;
+function rPanel(html){$("rbody").innerHTML=html;$("rpanel").classList.add("on");}
+function rIdle(){
+ if(DEMO){rPanel(`<h4>Public demo</h4><p>This is a static demo of <b>Pecunia</b> built from a real Webull account. Dollar amounts and share counts are scaled; percentages and market prices are real.</p><p>To use it with your own account (live refresh, any ticker), clone <a href="${REPO}" target="_blank" rel="noopener">the repo</a> and run <code>./run.sh</code> then <code>./serve.sh</code>.</p>`);return;}
+ if(!LIVE){rPanel(`<h4>Refresh data</h4><p>This page was opened as a file, so it can't rebuild itself. Either start the app with <code>./serve.sh</code> and press Refresh there, or run <code>./run.sh</code> in Terminal and reload this file.</p><p>Data shown is as of <b>${dfmt(END)}</b>, positions as of <b>${dfmt(P.as_of)}</b>.</p>`);return;}
+ rPanel(`<h4>Refresh data</h4><p>Showing data as of <b>${dfmt(END)}</b> (positions ${dfmt(P.as_of)}). Rebuilds every page: analysis, all ${Object.keys(SH).length} compared tickers, dips and sectors.</p>
+  <button class="opt" data-m="full"><b>Full refresh</b><small>New trades + positions from Webull (read-only), then fresh prices. About 1–2 minutes.</small></button>
+  <button class="opt" data-m="prices"><b>Prices only</b><small>Skip Webull and re-pull market prices for the trades already saved. Use this if Webull login fails.</small></button>`);
+ $("rbody").querySelectorAll(".opt").forEach(b=>b.onclick=()=>rStart(b.dataset.m));
+}
+async function rStart(mode){
+ try{const r=await fetch("/api/refresh?mode="+mode,{method:"POST",headers:{"X-Portfolio-Lab":"1"}});if(r.status!==202&&r.status!==409)throw new Error("HTTP "+r.status);rPoll();}
+ catch(e){rPanel(`<h4>Couldn't start refresh</h4><p class="neg">${esc(e.message)}. Is <code>./serve.sh</code> still running?</p>`);}
+}
+async function rPoll(){
+ clearTimeout(rTimer);let s;
+ try{s=await (await fetch("/api/refresh",{cache:"no-store"})).json();}catch(e){rPanel(`<h4>Lost connection</h4><p>The local server stopped. Restart <code>./serve.sh</code>.</p>`);$("rbtn").classList.remove("busy");return;}
+ const pct=s.steps?Math.round(((s.status==="done"?s.steps:s.step-1)+(s.status==="running"?.5:0))/s.steps*100):3,log=`<div class="rlog">${esc((s.log||[]).join("\n"))}</div>`;
+ $("rbtn").classList.toggle("busy",s.status==="running");$("rbtn").textContent=s.status==="running"?"Refreshing…":"↻ Refresh";
+ if(s.status==="running"){
+  if($("rpanel").classList.contains("on")||!rendered._rSeen){rPanel(`<h4>Refreshing… <span style="color:var(--mute);font-weight:500">${s.elapsed||0}s</span></h4><p>Step ${s.step||1} of ${s.steps||"?"}: ${esc(s.label||"")}</p><div class="rprog"><i style="width:${pct}%"></i></div>${log}`);rendered._rSeen=true;const l=$("rbody").querySelector(".rlog");if(l)l.scrollTop=l.scrollHeight;}
+  rTimer=setTimeout(rPoll,1200);return;
+ }
+ if(s.status==="done"&&s.mode){rPanel(`<h4 class="pos">✓ Refreshed in ${s.elapsed}s</h4><p>Reloading with the new data…</p><div class="rprog"><i style="width:100%"></i></div>`);setTimeout(()=>{sessionStorage.setItem("rDone","1");location.reload();},900);return;}
+ if(s.status==="error"){rPanel(`<h4 class="neg">Refresh failed</h4><p>${esc(s.label||"")}. Nothing on this page was changed (the last good report is kept). If Webull login failed, try <b>Prices only</b>.</p>${log}<button class="opt" data-m="prices" style="margin-top:10px"><b>Retry with prices only</b></button>`);$("rbody").querySelector(".opt").onclick=()=>rStart("prices");}
+}
+$("rbtn").onclick=e=>{e.stopPropagation();const p=$("rpanel");if(p.classList.contains("on")&&!$("rbtn").classList.contains("busy")){p.classList.remove("on");return;}if($("rbtn").classList.contains("busy")){rendered._rSeen=false;rPoll();}else rIdle();};
+document.addEventListener("click",e=>{if(!$("rpanel").contains(e.target)&&e.target!==$("rbtn")&&!$("rbtn").classList.contains("busy"))$("rpanel").classList.remove("on");});
+
+// ================= boot =================
+$("foot").textContent=`Data as of ${dfmt(END)} · Generated ${new Date().toLocaleDateString()} · For informational purposes only; not investment advice.`;
+addEventListener("resize",()=>{clearTimeout(window._rt);window._rt=setTimeout(treemap,150);});
+(async()=>{
+ if(location.protocol.startsWith("http")){try{const r=await fetch("/api/ping");LIVE=r.ok;}catch(e){}}
+ route();
+ const lv=$("live");lv.classList.toggle("on",LIVE);lv.querySelector("span").textContent=LIVE?"Live: any ticker":"Static mode";
+ if(DEMO){lv.querySelector("span").textContent="Demo · amounts scaled";}
+ lv.title=DEMO?"Public demo: dollar amounts and share counts are scaled; percentages are real.":LIVE?"Connected to the local server: any ticker can be analyzed":"Opened as a file: only pre-computed tickers. Run ./serve.sh for any ticker.";
+ if(rendered.compare&&cmpT)chips();
+ if(LIVE){try{const s=await (await fetch("/api/refresh",{cache:"no-store"})).json();if(s.status==="running"){rendered._rSeen=false;rPoll();}}catch(e){}}
+ if(sessionStorage.getItem("rDone")){sessionStorage.removeItem("rDone");rPanel(`<h4 class="pos">✓ Up to date</h4><p>Data as of <b>${dfmt(END)}</b> · positions ${dfmt(P.as_of)}.</p>`);setTimeout(()=>$("rpanel").classList.remove("on"),4000);}
+})();
+</script>
+</body>
+</html>
