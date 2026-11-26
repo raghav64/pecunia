@@ -40,10 +40,11 @@ Pecunia uses three measures that do work:
 
 ## The app (v2): live dashboard
 
-A React dashboard on a small Node API: live portfolio value, the S&P 500 and Nasdaq today, a watchlist, positions marked to live prices, sector allocation and your lead over the S&P 500. It has light and dark themes, an icon rail with an analysis menu, and a Refresh panel that streams progress. The analysis pages from v1 are embedded while they're ported to React.
+A React dashboard on a small Node API: live portfolio value, the S&P 500 and Nasdaq today, a watchlist, positions marked to live prices, sector allocation and your lead over the S&P 500. It has light and dark themes, an icon rail with an analysis menu, and a Refresh panel that streams progress. The S&P 500 / Nasdaq page is ported to React; the other analysis pages from v1 are embedded until they're ported.
 
 <p>
 <img src="docs/screens/app-home-light.png" width="49%"> <img src="docs/screens/app-home-dark.png" width="49%">
+<img src="docs/screens/app-benchmarks.png" width="49%"> <img src="docs/screens/app-menu.png" width="49%">
 </p>
 
 Design: Figma mocks and tokens in [`assets/figma`](assets/figma) · architecture in [`system-design/`](system-design/README.md).

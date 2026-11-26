@@ -122,7 +122,7 @@ Each component lists its responsibility, inputs → outputs, and the design deci
 
 ---
 
-## 11. v2: Node API, SSE hub, React app (implemented; analysis pages still embedded from v1)
+## 11. v2: Node API, SSE hub, React app (implemented: Home and S&P 500 / Nasdaq in React; other analysis pages embedded from v1)
 
 | Component | Responsibility |
 |---|---|

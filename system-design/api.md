@@ -94,6 +94,7 @@ When `status` becomes `done`, reload the page to get the new embedded data. On `
 | `GET /api/portfolio/history?range=1W\|1M\|3M\|YTD\|1Y\|ALL` | `[{d, value, invested, spy, qqq}]` for the main chart | until refresh |
 | `GET /api/quotes?symbols=SPY,QQQ,AAPL` | `[{symbol, name, price, prevClose, changePct, spark:[…]}]` (5-minute intraday) | 30–60 s |
 | `GET /api/stream` | SSE: `event: portfolio` (summary) and `event: quotes` (SPY, QQQ, watchlist) every `refreshSeconds` | push |
+| `GET /api/benchmarks` | Payload for the S&P 500 / Nasdaq page: `{end, stats, spy, qqq, series:[{d, v, inv, twr, spy, qqq, spyVal, qqqVal}], monthly, why:{brokerSimpleReturn, avgAgeMonths, lastYear, last6m, firstYear, quarters[]}}` | file mtime |
 | `GET /api/analysis/benchmarks` · `/dips` · `/sectors` | Contents of `analysis.json` · `dips.json` · `sectors.json` (404 until built) | file mtime |
 | `GET /api/shadow/:ticker[?refresh=1]` | Same payload as v1 `/api/shadow`; recomputed via `shadow.py` when missing or stale | disk |
 | `POST /api/refresh` `{mode:"full"\|"prices"}` | Start job → `202 {jobId, job}` · `409` if busy · `403` without `X-Pecunia: 1` | — |

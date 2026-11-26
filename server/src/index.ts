@@ -14,6 +14,7 @@ import { DATA, IS_PROD, PORT, ROOT, UV, getSettings, readJson, saveSettings } fr
 import { getQuotes, validSymbol } from "./quotes.js";
 import { allocation, history, positions, summary } from "./portfolio.js";
 import { bus, currentJob, startRefresh, type JobState } from "./jobs.js";
+import { benchmarks } from "./benchmarks.js";
 
 const app = new Hono();
 if (!IS_PROD) app.use("/api/*", logger());
@@ -50,6 +51,10 @@ app.get("/api/quotes", async (c) => {
   const bad = syms.filter((s) => !validSymbol(s));
   if (bad.length) return c.json({ error: { code: "BAD_SYMBOL", message: `invalid: ${bad.join(", ")}` } }, 400);
   return c.json(await getQuotes(syms));
+});
+
+app.get("/api/benchmarks", (c) => {
+  try { return c.json(benchmarks()); } catch (e) { return fail(c, e); }
 });
 
 app.get("/api/analysis/:name{benchmarks|dips|sectors}", (c) => {

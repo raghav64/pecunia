@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Rail from "./components/Rail";
 import Home from "./pages/Home";
 import Legacy from "./pages/Legacy";
+import Benchmarks from "./pages/Benchmarks";
 import { useTheme } from "./lib/theme";
 
 export const ANALYSES = [
@@ -22,7 +23,8 @@ export default function App() {
       <main className="min-w-0 flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
-          {ANALYSES.map((a) => (
+          <Route path="/analysis/benchmarks" element={<Benchmarks />} />
+          {ANALYSES.filter((a) => a.slug !== "benchmarks").map((a) => (
             <Route key={a.slug} path={`/analysis/${a.slug}`} element={<Legacy page={a.legacy} reloadKey={reloadKey} dark={theme.dark} />} />
           ))}
           <Route path="*" element={<Navigate to="/" replace />} />
