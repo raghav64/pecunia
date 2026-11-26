@@ -54,3 +54,15 @@ export function useLiveStream(watch: string[]) {
     return () => es.close();
   }, [qc, key]);
 }
+
+export type BenchSummary = { ticker: string; name: string; invested: number; value: number; gain: number; irr: number | null; twr: number; dd: number; lateStart: boolean; firstPrice: string };
+export type BasePayload = {
+  end: string;
+  stats: { actualValue: number; netInvested: number; gain: number; irr: number; twr: number; dd: number; nTrades: number; nBuys: number; years: number };
+  spy: BenchSummary; qqq: BenchSummary;
+  series: { d: string; v: number; inv: number; twr: number; spy: number; qqq: number; spyVal: number; qqqVal: number }[];
+  monthly: { m: string; buy: number; sell: number; n: number }[];
+  why: { brokerSimpleReturn: number | null; avgAgeMonths: number; accountMonths: number; totalBought: number; lastYear: number; last6m: number; firstYear: number; firstYearLabel: string; quarters: { q: string; amount: number }[] };
+};
+/** Portfolio series + SPY/QQQ shadows: the base every analysis page compares against. */
+export const useBase = () => useQuery({ queryKey: ["benchmarks"], queryFn: () => api<BasePayload>("/api/benchmarks"), staleTime: 5 * 60_000 });

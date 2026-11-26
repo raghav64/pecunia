@@ -5,7 +5,7 @@ import { api } from "../lib/api";
 
 type Job = { id: string; status: "running" | "done" | "error"; step: number; steps: number; label: string; log: string[]; started: number; finished: number | null };
 
-export default function RefreshPanel({ onClose, onDone }: { onClose: () => void; onDone: () => void }) {
+export default function RefreshPanel({ onClose }: { onClose: () => void }) {
   const qc = useQueryClient();
   const [job, setJob] = useState<Job | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -24,7 +24,7 @@ export default function RefreshPanel({ onClose, onDone }: { onClose: () => void;
       setJob(j);
       if (j.status !== "running") {
         es.close();
-        if (j.status === "done") { qc.invalidateQueries(); onDone(); }
+        if (j.status === "done") qc.invalidateQueries(); // every page refetches its data
       }
     };
     ["progress", "done", "error"].forEach((t) => es.addEventListener(t, on as EventListener));

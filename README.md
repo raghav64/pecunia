@@ -40,11 +40,12 @@ Pecunia uses three measures that do work:
 
 ## The app (v2): live dashboard
 
-A React dashboard on a small Node API: live portfolio value, the S&P 500 and Nasdaq today, a watchlist, positions marked to live prices, sector allocation and your lead over the S&P 500. It has light and dark themes, an icon rail with an analysis menu, and a Refresh panel that streams progress. The S&P 500 / Nasdaq page is ported to React; the other analysis pages from v1 are embedded until they're ported.
+A React dashboard on a small Node API: live portfolio value, the S&P 500 and Nasdaq today, a watchlist, positions marked to live prices, sector allocation and your lead over the S&P 500. It has light and dark themes, an icon rail with an analysis menu, and a Refresh panel that streams progress. Every analysis page (S&P 500 / Nasdaq, Compare any ticker, Dip buying, Re-orient, Trades & data) runs natively in React; type any ticker on Compare and the server runs the analysis live.
 
 <p>
 <img src="docs/screens/app-home-light.png" width="49%"> <img src="docs/screens/app-home-dark.png" width="49%">
-<img src="docs/screens/app-benchmarks.png" width="49%"> <img src="docs/screens/app-menu.png" width="49%">
+<img src="docs/screens/app-benchmarks.png" width="49%"> <img src="docs/screens/app-compare.png" width="49%">
+<img src="docs/screens/app-dips.png" width="49%"> <img src="docs/screens/app-sectors.png" width="49%">
 </p>
 
 Design: Figma mocks and tokens in [`assets/figma`](assets/figma) · architecture in [`system-design/`](system-design/README.md).

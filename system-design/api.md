@@ -1,7 +1,7 @@
 # API guide
 
 - **v1 (implemented):** `scripts/serve.py`, Python standard library HTTP server, `http://127.0.0.1:8765` (port is the first argument).
-- **v2 (implemented):** `server/src/index.ts`, Node/TypeScript on Hono, `http://127.0.0.1:8787` (`PORT` env). In development, Vite serves the UI on :5173 and proxies `/api` and `/legacy`.
+- **v2 (implemented):** `server/src/index.ts`, Node/TypeScript on Hono, `http://127.0.0.1:8787` (`PORT` env). In development, Vite serves the UI on :5173 and proxies `/api`.
 
 Conventions: JSON bodies, `Cache-Control: no-store`, errors as `{"error": "message"}`. The server binds to localhost only and has no authentication. Do not expose it publicly.
 
@@ -95,14 +95,16 @@ When `status` becomes `done`, reload the page to get the new embedded data. On `
 | `GET /api/quotes?symbols=SPY,QQQ,AAPL` | `[{symbol, name, price, prevClose, changePct, spark:[…]}]` (5-minute intraday) | 30–60 s |
 | `GET /api/stream` | SSE: `event: portfolio` (summary) and `event: quotes` (SPY, QQQ, watchlist) every `refreshSeconds` | push |
 | `GET /api/benchmarks` | Payload for the S&P 500 / Nasdaq page: `{end, stats, spy, qqq, series:[{d, v, inv, twr, spy, qqq, spyVal, qqqVal}], monthly, why:{brokerSimpleReturn, avgAgeMonths, lastYear, last6m, firstYear, quarters[]}}` | file mtime |
+| `GET /api/shadows` | Every saved shadow without its daily arrays (Compare chips + leaderboard), sorted by value | disk |
+| `GET /api/shadows/series?symbols=XLV,XLP,…` | `{T: {vals[], idx[]}}` aligned to the portfolio's days (Re-orient calculator + mix builder); max 80 symbols | disk |
+| `GET /api/trades` | Trade log, per-symbol P&L, reconciliation vs Webull, legacy sells, data-quality facts (Trades & data page) | file mtime |
 | `GET /api/analysis/benchmarks` · `/dips` · `/sectors` | Contents of `analysis.json` · `dips.json` · `sectors.json` (404 until built) | file mtime |
 | `GET /api/shadow/:ticker[?refresh=1]` | Same payload as v1 `/api/shadow`; recomputed via `shadow.py` when missing or stale | disk |
 | `POST /api/refresh` `{mode:"full"\|"prices"}` | Start job → `202 {jobId, job}` · `409` if busy · `403` without `X-Pecunia: 1` | — |
 | `GET /api/refresh` | Current or last job state, or `{status:"idle"}` | — |
 | `GET /api/refresh/:jobId/events` | SSE: `progress`, `log`, `done`, `error` | push |
 | `GET/PUT /api/settings` | `{theme, watchlist[] (max 8), refreshSeconds (15–300)}`, stored in `data/settings.json`; PUT needs `X-Pecunia: 1` | — |
-| `GET /api/health` · `/api/ping` | Liveness (`data` = analysis built?) · v1 compatibility | — |
-| `GET /legacy` | The v1 report, embedded by the React app for pages not yet ported | — |
+| `GET /api/health` | Liveness (`data` = analysis built?) | — |
 
 **Conventions**
 - Localhost-only binding. State-changing calls (`POST /api/refresh`, `PUT /api/settings`) need the `X-Pecunia: 1` header, which browsers can't add cross-site without a CORS preflight the server never approves.

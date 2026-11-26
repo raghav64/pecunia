@@ -15,6 +15,7 @@ import { getQuotes, validSymbol } from "./quotes.js";
 import { allocation, history, positions, summary } from "./portfolio.js";
 import { bus, currentJob, startRefresh, type JobState } from "./jobs.js";
 import { benchmarks } from "./benchmarks.js";
+import { shadowList, shadowSeries, tradeData } from "./analysis.js";
 
 const app = new Hono();
 if (!IS_PROD) app.use("/api/*", logger());
@@ -26,10 +27,6 @@ const requireAppHeader = async (c: Context, next: () => Promise<void>) => {
   if (c.req.header("X-Pecunia") !== "1") return c.json({ error: { code: "FORBIDDEN", message: "missing X-Pecunia header" } }, 403);
   await next();
 };
-
-// v1 compatibility for the embedded classic report
-app.get("/api/ping", (c) => c.json({ ok: true }));
-app.get("/api/shadow", (c) => c.redirect(`/api/shadow/${encodeURIComponent(c.req.query("t") ?? "")}${c.req.query("refresh") === "1" ? "?refresh=1" : ""}`));
 
 app.get("/api/health", (c) => c.json({ ok: true, data: existsSync(join(DATA, "analysis.json")) }));
 
@@ -55,6 +52,15 @@ app.get("/api/quotes", async (c) => {
 
 app.get("/api/benchmarks", (c) => {
   try { return c.json(benchmarks()); } catch (e) { return fail(c, e); }
+});
+
+app.get("/api/shadows", (c) => c.json(shadowList()));
+app.get("/api/shadows/series", (c) => {
+  const syms = (c.req.query("symbols") ?? "").toUpperCase().split(",").filter(validSymbol).slice(0, 80);
+  return c.json(shadowSeries(syms));
+});
+app.get("/api/trades", (c) => {
+  try { return c.json(tradeData()); } catch (e) { return fail(c, e); }
 });
 
 app.get("/api/analysis/:name{benchmarks|dips|sectors}", (c) => {
@@ -130,12 +136,6 @@ app.get("/api/stream", (c) =>
 );
 
 app.all("/api/*", (c) => c.json({ error: { code: "NOT_FOUND", message: "no such endpoint" } }, 404));
-
-// The classic single-file report, kept available while pages are migrated to React.
-app.get("/legacy", (c) => {
-  const f = process.env.PECUNIA_REPORT || join(ROOT, "portfolio-report.html");
-  return existsSync(f) ? c.html(readFileSync(f, "utf8")) : c.text("Report not built yet: run ./run.sh", 404);
-});
 
 if (IS_PROD) {
   app.use("/*", serveStatic({ root: relative(process.cwd(), join(ROOT, "web", "dist")) }));

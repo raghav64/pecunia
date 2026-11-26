@@ -77,7 +77,7 @@ flowchart LR
 
 **Key idea:** all heavy computation happens in a batch pipeline that writes JSON. The report is a static single-page app with that JSON embedded. The local server adds only the dynamic parts: any-ticker analysis and on-demand refresh. The same HTML therefore works three ways: served live, opened as a file, or published as a demo.
 
-## High-level design: v2 (implemented: home dashboard; analysis pages embedded from v1 while being ported)
+## High-level design: v2 (implemented: home dashboard and all analysis pages in React)
 
 ```mermaid
 flowchart LR

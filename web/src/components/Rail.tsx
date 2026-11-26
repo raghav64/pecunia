@@ -20,7 +20,7 @@ function RailButton({ label, active, onClick, children }: { label: string; activ
   );
 }
 
-export default function Rail({ theme, onRefreshed }: { theme: ReturnType<typeof useTheme>; onRefreshed: () => void }) {
+export default function Rail({ theme }: { theme: ReturnType<typeof useTheme> }) {
   const [menu, setMenu] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const loc = useLocation();
@@ -72,7 +72,7 @@ export default function Rail({ theme, onRefreshed }: { theme: ReturnType<typeof 
           })}
         </div>
       )}
-      {refresh && <RefreshPanel onClose={() => setRefresh(false)} onDone={onRefreshed} />}
+      {refresh && <RefreshPanel onClose={() => setRefresh(false)} />}
     </aside>
   );
 }
