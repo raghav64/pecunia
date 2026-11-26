@@ -38,13 +38,15 @@ Pecunia uses three measures that do work:
 <img src="docs/screens/report-sectors.png" width="49%"> <img src="docs/screens/report-benchmarks.png" width="49%">
 </p>
 
-## Redesign in progress
+## The app (v2): live dashboard
 
-The next version is a React dashboard: a live home screen (portfolio value, S&P 500 and Nasdaq today, a watchlist, positions) with the analyses behind a menu, in light and dark themes. Figma mocks are in [`assets/figma`](assets/figma):
+A React dashboard on a small Node API: live portfolio value, the S&P 500 and Nasdaq today, a watchlist, positions marked to live prices, sector allocation and your lead over the S&P 500. It has light and dark themes, an icon rail with an analysis menu, and a Refresh panel that streams progress. The analysis pages from v1 are embedded while they're ported to React.
 
 <p>
-<img src="assets/figma/home-light.png" width="49%"> <img src="assets/figma/home-dark.png" width="49%">
+<img src="docs/screens/app-home-light.png" width="49%"> <img src="docs/screens/app-home-dark.png" width="49%">
 </p>
+
+Design: Figma mocks and tokens in [`assets/figma`](assets/figma) · architecture in [`system-design/`](system-design/README.md).
 
 ## How it works
 
@@ -71,8 +73,14 @@ Requirements: [uv](https://docs.astral.sh/uv/) (Python), a Webull OpenAPI app ke
 
 ```bash
 export WEBULL_APP_KEY=...  WEBULL_APP_SECRET=...   # WEBULL_ACCOUNT_ID optional (auto-detected)
-./run.sh                    # fetch → analyze → build portfolio-report.html
-./serve.sh                  # local app with live "compare any ticker" and a Refresh button
+./run.sh                    # fetch → analyze → build portfolio-report.html (and the data the app reads)
+
+# v2 app (Node 20.19+ / 22.12+)
+npm install
+npm run dev                 # API on :8787 + React on http://127.0.0.1:5173
+npm run build && npm start  # production: one server on http://127.0.0.1:8787
+
+./serve.sh                  # v1 single-page report with "compare any ticker" and Refresh
 uv run python scripts/shadow.py COST NVDA BRK.B    # shadow analysis from the terminal
 uv run python scripts/make_demo.py                 # rebuild the scaled public demo in docs/
 ```
@@ -86,7 +94,10 @@ High-level design, component write-ups, request flows and the API guide are in [
 ## Project layout
 
 ```
-scripts/        pipeline (fetch → analyze → report), local server, demo builder
+scripts/        pipeline (fetch → analyze → report), v1 server, demo builder
+server/         v2 Node API (Hono): live quotes, positions, SSE stream, refresh jobs
+web/            v2 React app (Vite, Tailwind, TanStack Query, Recharts)
+config/         shared instrument → sector map
 docs/           public demo build (GitHub Pages) + screenshots
 assets/figma/   dashboard redesign mocks
 system-design/  HLD, components, request flows, API guide

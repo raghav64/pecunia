@@ -1,7 +1,7 @@
 # API guide
 
 - **v1 (implemented):** `scripts/serve.py`, Python standard library HTTP server, `http://127.0.0.1:8765` (port is the first argument).
-- **v2 (planned):** Node/TypeScript server with the same base URL and conventions. Marked **planned** below.
+- **v2 (implemented):** `server/src/index.ts`, Node/TypeScript on Hono, `http://127.0.0.1:8787` (`PORT` env). In development, Vite serves the UI on :5173 and proxies `/api` and `/legacy`.
 
 Conventions: JSON bodies, `Cache-Control: no-store`, errors as `{"error": "message"}`. The server binds to localhost only and has no authentication. Do not expose it publicly.
 
@@ -85,24 +85,26 @@ When `status` becomes `done`, reload the page to get the new embedded data. On `
 
 ---
 
-## v2 endpoints (planned)
+## v2 endpoints (implemented)
 
 | Method & path | Purpose | Cache |
 |---|---|---|
-| `GET /api/portfolio/summary` | `{value, cash, dayChange, dayChangePct, unrealizedPnl, asOf}` | 30 s |
-| `GET /api/positions` | `[{symbol, name, sector, qty, price, dayPct, value, weight, gain, gainPct}]` | 30 s |
-| `GET /api/portfolio/history?range=1D\|1W\|1M\|3M\|YTD\|1Y\|ALL` | `[{d, value, invested, spyShadow}]` for the main chart | until refresh |
+| `GET /api/portfolio/summary` | `{value, cash, marketValue, dayChange, dayChangePct, unrealizedPnl, positionsAsOf, pricesAsOf, marketState, count, benchmark{lead, irr, irrSpy, twr, dd, …}}`: positions snapshot marked to live quotes | quotes 30 s |
+| `GET /api/positions` | `{positions:[{symbol, name, sector, qty, avgCost, price, prevClose, value, dayChange, dayPct, weight, gain, gainPct, live}], cash, asOf, allocation:[{sector, value, weight}]}` | quotes 30 s |
+| `GET /api/portfolio/history?range=1W\|1M\|3M\|YTD\|1Y\|ALL` | `[{d, value, invested, spy, qqq}]` for the main chart | until refresh |
 | `GET /api/quotes?symbols=SPY,QQQ,AAPL` | `[{symbol, name, price, prevClose, changePct, spark:[…]}]` (5-minute intraday) | 30–60 s |
-| `GET /api/stream` | SSE: `event: quote`, `event: portfolio`, `event: job` | push |
-| `GET /api/analysis/benchmarks` | SPY/QQQ shadows, TWR by period, calendar years, drawdowns | until refresh |
-| `GET /api/shadow/:ticker` | Same payload as v1 `/api/shadow` | disk |
-| `GET /api/analysis/dips` | Contents of `dips.json` | until refresh |
-| `GET /api/analysis/sectors` | Contents of `sectors.json` | until refresh |
-| `POST /api/refresh` `{mode}` | Start job → `202 {jobId}` · `409` if busy | — |
+| `GET /api/stream` | SSE: `event: portfolio` (summary) and `event: quotes` (SPY, QQQ, watchlist) every `refreshSeconds` | push |
+| `GET /api/analysis/benchmarks` · `/dips` · `/sectors` | Contents of `analysis.json` · `dips.json` · `sectors.json` (404 until built) | file mtime |
+| `GET /api/shadow/:ticker[?refresh=1]` | Same payload as v1 `/api/shadow`; recomputed via `shadow.py` when missing or stale | disk |
+| `POST /api/refresh` `{mode:"full"\|"prices"}` | Start job → `202 {jobId, job}` · `409` if busy · `403` without `X-Pecunia: 1` | — |
+| `GET /api/refresh` | Current or last job state, or `{status:"idle"}` | — |
 | `GET /api/refresh/:jobId/events` | SSE: `progress`, `log`, `done`, `error` | push |
-| `GET/PUT /api/settings` | `{theme, watchlist[], refreshSeconds}` | — |
+| `GET/PUT /api/settings` | `{theme, watchlist[] (max 8), refreshSeconds (15–300)}`, stored in `data/settings.json`; PUT needs `X-Pecunia: 1` | — |
+| `GET /api/health` · `/api/ping` | Liveness (`data` = analysis built?) · v1 compatibility | — |
+| `GET /legacy` | The v1 report, embedded by the React app for pages not yet ported | — |
 
-**Planned conventions**
-- Localhost-only binding. State-changing calls need a per-session CSRF token from `GET /api/session`.
-- Errors: `{"error": {"code": "TICKER_NOT_FOUND", "message": "…"}}` with 4xx/5xx status codes.
+**Conventions**
+- Localhost-only binding. State-changing calls (`POST /api/refresh`, `PUT /api/settings`) need the `X-Pecunia: 1` header, which browsers can't add cross-site without a CORS preflight the server never approves.
+- Errors: `{"error": {"code": "BAD_SYMBOL", "message": "…"}}` with 4xx/5xx status codes.
+- Upstream quote calls time out after 8 s; on failure the last cached quote is served.
 - Webull calls stay read-only and go through the Python worker; secrets come from environment variables only.

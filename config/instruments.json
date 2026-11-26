@@ -1,0 +1,137 @@
+{
+ "GOOGL": {
+  "name": "Alphabet",
+  "sector": "Communication Services",
+  "theme": "Internet & Media"
+ },
+ "NVDA": {
+  "name": "NVIDIA",
+  "sector": "Information Technology",
+  "theme": "Semiconductors"
+ },
+ "AAPL": {
+  "name": "Apple",
+  "sector": "Information Technology",
+  "theme": "Hardware & Networking"
+ },
+ "META": {
+  "name": "Meta Platforms",
+  "sector": "Communication Services",
+  "theme": "Internet & Media"
+ },
+ "PANW": {
+  "name": "Palo Alto Networks",
+  "sector": "Information Technology",
+  "theme": "Software & Cybersecurity"
+ },
+ "CRWD": {
+  "name": "CrowdStrike",
+  "sector": "Information Technology",
+  "theme": "Software & Cybersecurity"
+ },
+ "AMD": {
+  "name": "Advanced Micro Devices",
+  "sector": "Information Technology",
+  "theme": "Semiconductors"
+ },
+ "MSFT": {
+  "name": "Microsoft",
+  "sector": "Information Technology",
+  "theme": "Software & Cybersecurity"
+ },
+ "COST": {
+  "name": "Costco",
+  "sector": "Consumer Staples",
+  "theme": "Consumer"
+ },
+ "AMZN": {
+  "name": "Amazon",
+  "sector": "Consumer Discretionary",
+  "theme": "Internet & Media"
+ },
+ "QQQ": {
+  "name": "Invesco QQQ (Nasdaq-100)",
+  "sector": "ETF \u2013 Nasdaq-100",
+  "theme": "Index ETF"
+ },
+ "ANET": {
+  "name": "Arista Networks",
+  "sector": "Information Technology",
+  "theme": "Hardware & Networking"
+ },
+ "SPOT": {
+  "name": "Spotify",
+  "sector": "Communication Services",
+  "theme": "Internet & Media"
+ },
+ "APP": {
+  "name": "AppLovin",
+  "sector": "Information Technology",
+  "theme": "Software & Cybersecurity"
+ },
+ "AXP": {
+  "name": "American Express",
+  "sector": "Financials",
+  "theme": "Financials"
+ },
+ "TSLA": {
+  "name": "Tesla",
+  "sector": "Consumer Discretionary",
+  "theme": "Consumer"
+ },
+ "PLTR": {
+  "name": "Palantir",
+  "sector": "Information Technology",
+  "theme": "Software & Cybersecurity"
+ },
+ "CAVA": {
+  "name": "CAVA Group",
+  "sector": "Consumer Discretionary",
+  "theme": "Consumer"
+ },
+ "AVGO": {
+  "name": "Broadcom",
+  "sector": "Information Technology",
+  "theme": "Semiconductors"
+ },
+ "CMG": {
+  "name": "Chipotle",
+  "sector": "Consumer Discretionary",
+  "theme": "Consumer"
+ },
+ "TSM": {
+  "name": "Taiwan Semiconductor",
+  "sector": "Information Technology",
+  "theme": "Semiconductors"
+ },
+ "SOUN": {
+  "name": "SoundHound AI",
+  "sector": "Information Technology",
+  "theme": "Software & Cybersecurity"
+ },
+ "SNDK": {
+  "name": "SanDisk",
+  "sector": "Information Technology",
+  "theme": "Semiconductors"
+ },
+ "SPCX": {
+  "name": "SPCX",
+  "sector": "Other / unclassified",
+  "theme": "Other"
+ },
+ "SERV": {
+  "name": "Serve Robotics",
+  "sector": "Industrials",
+  "theme": "Other"
+ },
+ "WMT": {
+  "name": "Walmart",
+  "sector": "Consumer Staples",
+  "theme": "Other"
+ },
+ "SPY": {
+  "name": "S&P 500",
+  "sector": "ETF \u2013 S&P 500",
+  "theme": "Other"
+ }
+}

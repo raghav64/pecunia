@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Flexoki tokens (see assets/figma/README.md) */
+:root {
+  --page: #f2f0e5; --card: #fffcf0; --raised: #e6e4d9; --rail: #fffcf0;
+  --border: #e6e4d9; --border-strong: #cecdc3;
+  --tx: #100f0f; --tx-2: #6f6e69; --tx-3: #b7b5ac;
+  --pos: #66800b; --neg: #af3029; --orange: #bc5215;
+  --chart: #66800b; --chart-fill: #879a39; --bench: #b7b5ac;
+  --sel: #100f0f; --sel-tx: #fffcf0;
+  color-scheme: light;
+}
+.dark {
+  --page: #100f0f; --card: #1c1b1a; --raised: #282726; --rail: #0a0a0a;
+  --border: #282726; --border-strong: #403e3c;
+  --tx: #cecdc3; --tx-2: #878580; --tx-3: #575653;
+  --pos: #879a39; --neg: #d14d41; --orange: #da702c;
+  --chart: #879a39; --chart-fill: #879a39; --bench: #575653;
+  --sel: #cecdc3; --sel-tx: #100f0f;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-page: var(--page); --color-card: var(--card); --color-raised: var(--raised); --color-rail: var(--rail);
+  --color-line: var(--border); --color-line-strong: var(--border-strong);
+  --color-tx: var(--tx); --color-tx-2: var(--tx-2); --color-tx-3: var(--tx-3);
+  --color-pos: var(--pos); --color-neg: var(--neg); --color-orange: var(--orange);
+  --color-chart: var(--chart); --color-bench: var(--bench); --color-sel: var(--sel); --color-sel-tx: var(--sel-tx);
+  --font-sans: "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html, body, #root { height: 100%; }
+body { @apply bg-page text-tx font-sans antialiased; }
+.num { @apply font-mono tabular-nums; }
+.card { @apply bg-card border border-line rounded-2xl; }

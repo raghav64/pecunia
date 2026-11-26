@@ -102,7 +102,7 @@ sequenceDiagram
   Note over G: Static. Any-ticker and Refresh show demo guidance.
 ```
 
-## 5. Live home dashboard (v2, planned)
+## 5. Live home dashboard (v2)
 
 ```mermaid
 sequenceDiagram
@@ -130,7 +130,7 @@ sequenceDiagram
   end
 ```
 
-## 6. Refresh job with streaming progress (v2, planned)
+## 6. Refresh job with streaming progress (v2)
 
 ```mermaid
 sequenceDiagram

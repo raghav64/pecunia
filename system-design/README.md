@@ -77,7 +77,7 @@ flowchart LR
 
 **Key idea:** all heavy computation happens in a batch pipeline that writes JSON. The report is a static single-page app with that JSON embedded. The local server adds only the dynamic parts: any-ticker analysis and on-demand refresh. The same HTML therefore works three ways: served live, opened as a file, or published as a demo.
 
-## High-level design: v2 (planned)
+## High-level design: v2 (implemented: home dashboard; analysis pages embedded from v1 while being ported)
 
 ```mermaid
 flowchart LR
@@ -120,6 +120,7 @@ What changes in v2: a live home screen (value, S&P/Nasdaq today, watchlist, posi
 
 | Mode | How | Dynamic features | Data |
 |---|---|---|---|
+| **Local v2 app** | `npm run dev` or `npm run build && npm start` | Live home, SSE updates, Refresh, any-ticker | Real (`data/`) |
 | **Local live** | `./serve.sh` | Any-ticker compare, Refresh | Real (`data/`) |
 | **Local file** | open `portfolio-report.html` | None (precomputed only) | Real |
 | **Public demo** | `make_demo.py` → `docs/` → GitHub Pages | None (explains how to run locally) | Scaled copy (`build/demo-data/`) |

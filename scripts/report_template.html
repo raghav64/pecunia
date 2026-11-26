@@ -81,6 +81,7 @@ code{background:#f1f3f6;padding:1px 5px;border-radius:4px;font-size:13px}
 .rpanel .opt:hover{border-color:var(--acc);background:#f5f8ff}.rpanel .opt b{display:block}.rpanel .opt small{color:var(--mute)}
 .rprog{height:8px;background:#e8ecf3;border-radius:4px;overflow:hidden;margin:10px 0 6px}.rprog i{display:block;height:100%;background:var(--acc);transition:width .4s}
 .rlog{font:11px/1.45 ui-monospace,Menlo,monospace;background:#f6f7f9;border-radius:8px;padding:8px;max-height:150px;overflow:auto;white-space:pre-wrap;color:#445;margin-top:8px}
+.embedded header{display:none}.embedded main{padding-top:8px}
 footer{color:var(--mute);font-size:12px;text-align:center;margin-top:30px}
 </style>
 </head>
@@ -294,6 +295,7 @@ const SH=/*SHADOWS*/null;
 const DP=/*DIPS*/null;
 const SX=/*SECTORS*/null;
 const DEMO=/*DEMO*/false;
+if(window.top!==window)document.documentElement.classList.add("embedded"); // inside the React app
 const REPO="https://github.com/raghav64/pecunia";
 const BLUE=["COST","AMZN","GOOGL","WMT","MSFT"];
 const INFO={GOOGL:["Alphabet","Communication Services","Internet & Media"],NVDA:["NVIDIA","Information Technology","Semiconductors"],AAPL:["Apple","Information Technology","Hardware & Networking"],META:["Meta Platforms","Communication Services","Internet & Media"],PANW:["Palo Alto Networks","Information Technology","Software & Cybersecurity"],CRWD:["CrowdStrike","Information Technology","Software & Cybersecurity"],AMD:["Advanced Micro Devices","Information Technology","Semiconductors"],MSFT:["Microsoft","Information Technology","Software & Cybersecurity"],COST:["Costco","Consumer Staples","Consumer"],AMZN:["Amazon","Consumer Discretionary","Internet & Media"],QQQ:["Invesco QQQ (Nasdaq-100)","ETF – Nasdaq-100","Index ETF"],ANET:["Arista Networks","Information Technology","Hardware & Networking"],SPOT:["Spotify","Communication Services","Internet & Media"],APP:["AppLovin","Information Technology","Software & Cybersecurity"],AXP:["American Express","Financials","Financials"],TSLA:["Tesla","Consumer Discretionary","Consumer"],PLTR:["Palantir","Information Technology","Software & Cybersecurity"],CAVA:["CAVA Group","Consumer Discretionary","Consumer"],AVGO:["Broadcom","Information Technology","Semiconductors"],CMG:["Chipotle","Consumer Discretionary","Consumer"],TSM:["Taiwan Semiconductor","Information Technology","Semiconductors"],SOUN:["SoundHound AI","Information Technology","Software & Cybersecurity"],SNDK:["SanDisk","Information Technology","Semiconductors"],SPCX:["SPCX","Other / unclassified","Other"],SERV:["Serve Robotics","Industrials","Other"]};
