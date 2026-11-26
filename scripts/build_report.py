@@ -16,6 +16,11 @@ dips_p = DATA / "dips.json"
 dips = dips_p.read_text() if dips_p.exists() else "null"
 sect_p = DATA / "sectors.json"
 sect = sect_p.read_text() if sect_p.exists() else "null"
+def data_uri(p):
+    import base64
+    return "data:image/png;base64," + base64.b64encode((ROOT / p).read_bytes()).decode()
+tpl = (tpl.replace("__LOGO__", data_uri("assets/brand/pecunia-wordmark-dark.png"))
+          .replace("__ICON__", data_uri("assets/brand/pecunia-icon-64.png")))
 html = (tpl.replace("/*DIPS*/null", dips).replace("/*SECTORS*/null", sect).replace("/*DEMO*/false", "true" if os.environ.get("PECUNIA_DEMO") else "false").replace("/*ANALYSIS*/null", analysis)
            .replace("/*POSITIONS*/null", positions)
            .replace("/*SHADOWS*/null", json.dumps(shadows, separators=(",", ":"))))

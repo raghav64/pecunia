@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/brand/pecunia-logo.png" alt="pecunia: Stock Solutions by RM" width="320"></p>
+
 # Pecunia
 
 **Did my stock picks actually beat the market, or did I just add money in a bull run?**
